@@ -25,7 +25,7 @@ def register(server_url: str, password="") -> bool:
     )
 
     try:
-        res = requests.post(f"{server_url}/register", json={
+        res = requests.post(f"{server_url}/api/register", json={
             "name": host_info.name,
             "local_ip": host_info.local_ip,
             "password": host_info.password
