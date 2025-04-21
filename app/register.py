@@ -6,6 +6,7 @@ from dataclasses import dataclass
 class HostInfo:
     name: str
     local_ip: str
+    port: int
     password: str
 
 def get_local_ip():
@@ -17,10 +18,11 @@ def get_local_ip():
         s.close()
     return ip
 
-def register(server_url: str, password="") -> bool:
+def register(server_url: str, port: int = 8765, password: str="") -> bool:
     host_info = HostInfo(
         name=socket.gethostname(),
         local_ip=get_local_ip(),
+        port=port,
         password=password
     )
 
@@ -28,6 +30,7 @@ def register(server_url: str, password="") -> bool:
         res = requests.post(f"{server_url}/api/register", json={
             "name": host_info.name,
             "local_ip": host_info.local_ip,
+            "port": host_info.port,
             "password": host_info.password
         })
         res.raise_for_status()
