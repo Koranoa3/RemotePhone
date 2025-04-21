@@ -1,11 +1,11 @@
-from register import register, get_local_ip
-from heartbeat import start_heartbeat
-from websocket_server import run_websocket_server
+from server.register import register, get_local_ip
+from server.heartbeat import start_heartbeat
+from client.websocket_server import run_websocket_server
 import threading, asyncio
 import time
 
 if __name__ == "__main__":
-    server_url = "http://r620-dell.tail9d6e9.ts.net:8000"
+    server_url = "http://skyboxx.tplinkdns.com:8000"
 
     success = register(server_url, password="password")
     if success:
