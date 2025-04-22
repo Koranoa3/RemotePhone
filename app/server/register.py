@@ -30,8 +30,7 @@ def register(server_url: str, port: int = 8765, password: str="") -> bool:
         res = requests.post(f"{server_url}/api/register", json={
             "name": host_info.name,
             "local_ip": host_info.local_ip,
-            "port": host_info.port,
-            "password": host_info.password
+            "port": host_info.port
         })
         res.raise_for_status()
         print("登録結果:", res.json())
