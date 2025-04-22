@@ -1,5 +1,4 @@
 import win32con, ctypes
-import math
 
 KEYEVENTF_KEYDOWN = 0x0000
 KEYEVENTF_KEYUP = 0x0002
@@ -39,11 +38,13 @@ def handle_event(data):
         return
 
     key_code = ACTIONS.get(action, None)
-    if key_code is None:
+    if key_code:
+
+        if isinstance(key_code, list):
+            hotkey(key_code)
+        else:
+            press_key(key_code)
+        
+    else:
         print(f"Unknown action command: {action}")
         return
-
-    if isinstance(key_code, list):
-        hotkey(key_code)
-    else:
-        press_key(key_code)

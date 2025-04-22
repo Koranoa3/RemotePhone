@@ -3,3 +3,4 @@ requests
 websockets
 pyautogui
 pywin32
+pycaw

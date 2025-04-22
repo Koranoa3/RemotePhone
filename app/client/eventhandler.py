@@ -1,7 +1,6 @@
 import asyncio, time, websockets, json
 from client.authenticator import on_auth_start, handle_auth_response
-from client.interactables import trackpad
-from client.interactables import action
+from client.interactables import trackpad, action, volume
 
 HEARTBEAT_INTERVAL = 3  # 秒
 HEARTBEAT_TIMEOUT = 6  # 秒以内にpongが返らなければ切断
@@ -60,6 +59,9 @@ async def handle_client(websocket):
             elif data.get("type").startswith("tp_"):
                 trackpad.handle_event(data["type"], data)
 
+            elif data.get("type").startswith("volume_"):
+                volume.handle_event(data["type"], data)
+                
             elif data.get("type") == "action":
                 action.handle_event(data)
                 
