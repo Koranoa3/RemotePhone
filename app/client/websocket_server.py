@@ -7,6 +7,7 @@ async def handler(websocket):
     print("📲 クライアント接続:", websocket.remote_address)
     connected_clients.add(websocket)
 
+    websocket.authenticated = False
     await handle_client(websocket)
 
     connected_clients.remove(websocket)
