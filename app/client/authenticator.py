@@ -42,7 +42,7 @@ class AuthSession:
 async def on_auth_start(ws, uuid: str):
     print("🔑 認証開始:", uuid)
     if if_uuid_registered(uuid):
-        print("✅ UUIDは登録済みです。")
+        print("✅ 認証成功: UUIDは登録済みです。")
         ws.authenticated = True
         await ws.send(json.dumps({"type": "auth_result", "status": "ok"}))
         return

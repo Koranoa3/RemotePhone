@@ -1,5 +1,7 @@
 import asyncio, time, websockets, json
 from client.authenticator import on_auth_start, handle_auth_response
+from client.interactables import trackpad
+from client.interactables import action
 
 HEARTBEAT_INTERVAL = 3  # 秒
 HEARTBEAT_TIMEOUT = 6  # 秒以内にpongが返らなければ切断
@@ -55,6 +57,12 @@ async def handle_client(websocket):
                 await websocket.send(json.dumps({"type": "rtt", "rtt": rtt}))
                 # print(f"📶 pong受信 RTT: {rtt}ms")
             
+            elif data.get("type").startswith("tp_"):
+                trackpad.handle_event(data["type"], data)
+
+            elif data.get("type") == "action":
+                action.handle_event(data)
+                
             else:
                 print("📩 通常メッセージ:", data)
 
