@@ -1,38 +1,31 @@
-from server.register import register, get_local_ip
-from server.heartbeat import start_heartbeat
-from client.websocket_server import run_websocket_server
 import threading, asyncio
 import time
 import json
-from logging import getLogger, config
-
-from PIL import Image
 
 from notifer import notify
 
-logger = getLogger(__name__)
-
+from logging import getLogger, config
 with open('log_config.json', 'r') as f:
     log_conf = json.load(f)
-
 config.dictConfig(log_conf)
+logger = getLogger(__name__)
+logger.info("初期化中...")
+
 
 def start_heartbeat_thread(server_url, local_ip):
+    from server.heartbeat import start_heartbeat
     t = threading.Thread(target=start_heartbeat, args=(server_url, local_ip), daemon=True)
     t.start()
 
 def start_websocket_thread(local_ip):
+    from client.websocket_server import run_websocket_server
     threading.Thread(target=lambda: asyncio.run(run_websocket_server(local_ip=local_ip)), daemon=True).start()
 
-def on_quit(icon, item):
-    logger.info("終了処理が呼ばれました。")
-    icon.stop()
-    # exit(0)
 
 import pystray
-from pystray import Icon
+from PIL import Image
 def setup_tray():
-    icon = Icon(
+    icon = pystray.Icon(
         "RemotePhone",
         Image.open("icon.ico"),
         menu=pystray.Menu(
@@ -41,10 +34,21 @@ def setup_tray():
     )
     return icon
 
+def on_quit(icon, item):
+    logger.info("終了処理が呼ばれました。")
+    icon.stop()
+
+
 SERVER_URL = "http://skyboxx.tplinkdns.com:8000"
+VERSION = "0.7.0"
 
 def main():
     logger.info("アプリケーションが起動しました。")
+
+    from server.updater import check_for_updates
+    check_for_updates(SERVER_URL + "/api/version", VERSION)
+
+    from server.register import register, get_local_ip
     success = register(SERVER_URL, port=8765)
     if success:
         local_ip = get_local_ip()
