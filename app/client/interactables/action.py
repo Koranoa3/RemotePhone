@@ -1,5 +1,8 @@
 import win32con, ctypes
 
+from logging import getLogger
+logger = getLogger(__name__)
+
 KEYEVENTF_KEYDOWN = 0x0000
 KEYEVENTF_KEYUP = 0x0002
 
@@ -20,7 +23,7 @@ def press_key(key_code):
         ctypes.windll.user32.keybd_event(key_code, 0, KEYEVENTF_KEYDOWN, 0)
         ctypes.windll.user32.keybd_event(key_code, 0, KEYEVENTF_KEYUP, 0)
     except Exception as e:
-        print(f"Error pressing key {key_code}: {e}")
+        logger.error(f"Error pressing key {key_code}: {e}")
 
 def hotkey(key_codes:list):
     try:
@@ -29,12 +32,12 @@ def hotkey(key_codes:list):
         for key_code in reversed(key_codes):
             ctypes.windll.user32.keybd_event(key_code, 0, KEYEVENTF_KEYUP, 0)
     except Exception as e:
-        print(f"Error pressing hotkey {key_codes}: {e}")
+        logger.error(f"Error pressing hotkey {key_codes}: {e}")
 
 def handle_event(data):
     action = data.get("action", None)
     if action is None or type(action) != str:
-        print(f"Invalid command: {action}")
+        logger.warning(f"Invalid command: {action}")
         return
 
     key_code = ACTIONS.get(action, None)
@@ -46,5 +49,5 @@ def handle_event(data):
             press_key(key_code)
         
     else:
-        print(f"Unknown action command: {action}")
+        logger.warning(f"Unknown action command: {action}")
         return

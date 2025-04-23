@@ -2,6 +2,9 @@ import asyncio, time, websockets, json
 from client.authenticator import on_auth_start, handle_auth_response
 from client.interactables import trackpad, action, volume
 
+from logging import getLogger
+logger = getLogger(__name__)
+
 HEARTBEAT_INTERVAL = 3  # 秒
 HEARTBEAT_TIMEOUT = 6  # 秒以内にpongが返らなければ切断
 
@@ -20,13 +23,13 @@ async def handle_client(websocket):
                 await websocket.send(ping_msg)
                 await asyncio.sleep(HEARTBEAT_INTERVAL)
                 if time.time() - last_pong > HEARTBEAT_TIMEOUT:
-                    print("💔 pongが返ってこないので切断")
+                    logger.warning("pongが返ってこないので切断")
                     await websocket.close()
                     break
             except websockets.ConnectionClosedOK as e:
                 break
             except:
-                print("💔 ping送信失敗")
+                logger.error("ping送信失敗")
                 break
 
     async def listen():
@@ -37,7 +40,7 @@ async def handle_client(websocket):
                 try:
                     data = json.loads(message)
                 except Exception:
-                    print("🛑 JSONデコードエラー:", message)
+                    logger.error("JSONデコードエラー:", message)
                     continue
 
                 if not websocket.authenticated:
@@ -52,7 +55,7 @@ async def handle_client(websocket):
                     rtt = now - data["timestamp"]
                     last_pong = time.time()
                     await websocket.send(json.dumps({"type": "rtt", "rtt": rtt}))
-                    # print(f"📶 pong受信 RTT: {rtt}ms")
+                    # logger.info(f"pong受信 RTT: {rtt}ms")
                 
                 elif data.get("type").startswith("tp_"):
                     trackpad.handle_event(data["type"], data)
@@ -64,20 +67,20 @@ async def handle_client(websocket):
                     action.handle_event(data)
                     
                 else:
-                    print("📩 通常メッセージ:", data)
+                    logger.info("タイプ検知外のメッセージ:", data)
                     
         except websockets.ConnectionClosedOK as e:
             if e.code == 1001:
-                print("👋 切断: クライアントが離脱")
+                logger.info("切断: クライアントが離脱")
             elif e.code == 4003:
-                print("🔑 切断: 認証失敗")
+                logger.info("切断: 認証失敗")
             else:
-                print(f"⚠️ 切断: 異常終了: {e.code} - {e.reason}")
+                logger.warning(f"切断: 異常終了: {e.code} - {e.reason}")
         except websockets.ConnectionClosedError as e:
             if e.code == 1006:
-                print("🔌 切断: なんか切れた")
+                logger.warning("🔌 切断: なんか切れた")
         except Exception as e:
             e.with_traceback()
-            print("🛑 Listenエラー:", e)
+            logger.error("Listenエラー:", e)
 
     await asyncio.gather(heartbeat(), listen())

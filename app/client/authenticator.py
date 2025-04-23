@@ -1,6 +1,9 @@
 import hashlib, time, json, os
 from dataclasses import dataclass
 
+from logging import getLogger
+logger = getLogger(__name__)
+
 registered_uuids_path = os.path.join(os.path.dirname(__file__), "..", "..", "registered_uuids.txt")
 # --- 認証済みUUID ---
 def if_uuid_registered(uuid: str) -> bool:
@@ -40,26 +43,26 @@ class AuthSession:
 
 # --- 認証処理 ---
 async def on_auth_start(ws, uuid: str):
-    print("🔑 認証開始:", uuid)
+    logger.info("認証開始:", uuid)
     if if_uuid_registered(uuid):
-        print("✅ 認証成功: UUIDは登録済みです。")
+        logger.info("認証成功: UUIDは登録済みです。")
         ws.authenticated = True
         await ws.send(json.dumps({"type": "auth_result", "status": "ok"}))
         return
     session = AuthSession(uuid=uuid)
     ws.auth = session
-    print("🔑 認証トークン:", session.passkey)
+    logger.info("認証トークン:", session.passkey)
     await ws.send(json.dumps({"type": "auth_needed", "message": "ホストから発行されたワンタイムキーを入力してください。"}))
 
 async def send_auth_needed(ws, message: str, regenerate: bool = True):
     if not hasattr(ws, "auth"):
-        print("❌ 認証セッションがありません。")
+        logger.info("認証セッションがありません。")
         return
 
     if regenerate:
         ws.auth.passkey = onetime_passkey(ws.auth.uuid)
         ws.auth.timestamp = int(time.time())
-        print("🔑 認証トークン再発行:", ws.auth.passkey)
+        logger.info("認証トークン再発行:", ws.auth.passkey)
 
     await ws.send(json.dumps({
         "type": "auth_needed",
@@ -76,14 +79,14 @@ async def handle_auth_response(ws, onetime: str):
 
     if status == "ok":
         ws.authenticated = True
-        print("✅ 認証成功")
+        logger.info("認証成功")
         if register_uuid(ws.auth.uuid):
-            print("✅ UUIDを登録しました。")
+            logger.info("UUIDを登録しました。")
         else:
-            print("❌ UUIDの登録に失敗しました。")
+            logger.error("UUIDの登録に失敗しました。")
         return True
 
-    print(f"❌ 認証失敗: {reason}")
+    logger.info(f"認証失敗: uuid:{ws.auth.uuid}, reason:{reason}")
     if not result.get("allow_retry", False):
         await ws.close(code=4003)
         return False

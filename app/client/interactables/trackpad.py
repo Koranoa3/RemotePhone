@@ -1,6 +1,9 @@
 import ctypes
 import math
 
+from logging import getLogger
+logger = getLogger(__name__)
+
 MOUSE_SPEED_MULTIPLIER = 1
 MOUSE_ACCELERATION = 1.2
 
@@ -12,7 +15,7 @@ def handle_event(event_type, data):
     elif event_type == "tp_scroll": # is_horiz, delta
         handle_scroll(data)
     else:
-        print(f"Unknown event type: {event_type}")
+        logger.warning(f"Unknown event type: {event_type}")
 
 
 def handle_tap():

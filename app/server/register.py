@@ -2,6 +2,9 @@ import socket
 import requests
 from dataclasses import dataclass
 
+from logging import getLogger
+logger = getLogger(__name__)
+
 @dataclass
 class HostInfo:
     name: str
@@ -23,7 +26,7 @@ def register(server_url: str, port: int = 8765) -> bool:
         local_ip=get_local_ip(),
         port=port
     )
-    print(f"💻 ホスト情報をサーバーに登録します: local_ip={host_info.local_ip}, port={host_info.port}")
+    logger.info(f"ホスト情報をサーバーに登録します: local_ip={host_info.local_ip}, port={host_info.port}")
     try:
         res = requests.post(f"{server_url}/api/register", json={
             "name": host_info.name,
@@ -31,11 +34,11 @@ def register(server_url: str, port: int = 8765) -> bool:
             "port": host_info.port
         })
         res.raise_for_status()
-        print(f"💻 ホスト情報登録: グローバルIP:{res.json().get("from_ip", "不明")}")
+        logger.info(f"ホスト情報登録: グローバルIP:{res.json().get("from_ip", "不明")}")
         return True
     except requests.exceptions.RequestException as e:
-        print(f"💻 ホスト情報登録失敗: {type(e.__cause__)}")
+        logger.error(f"ホスト情報登録失敗: {type(e.__cause__)}")
         return False
     except Exception as e:
-        print("💻 ホスト情報登録失敗:", e)
+        logger.error("ホスト情報登録失敗:", e)
         return False
