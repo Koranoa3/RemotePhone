@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from logging import getLogger
 logger = getLogger(__name__)
 
+from notifer import notify
+
 registered_uuids_path = os.path.join(os.path.dirname(__file__), "..", "..", "registered_uuids.txt")
 # --- 認証済みUUID ---
 def if_uuid_registered(uuid: str) -> bool:
@@ -25,8 +27,8 @@ def onetime_passkey(uuid: str, timestamp: int = None) -> str:
     if timestamp is None:
         timestamp = int(time.time())
     hash_object = hashlib.sha256(f"{uuid}{timestamp}".encode())
-    otp = int(hash_object.hexdigest(), 16) % 1000000
-    return f"{otp:06d}"
+    otp = int(hash_object.hexdigest(), 16) % 10000
+    return f"{otp:04d}"
 
 # --- セッション構造体 ---
 @dataclass
@@ -43,15 +45,17 @@ class AuthSession:
 
 # --- 認証処理 ---
 async def on_auth_start(ws, uuid: str):
-    logger.info("認証開始:", uuid)
+    logger.info(f"認証開始:{uuid}")
     if if_uuid_registered(uuid):
         logger.info("認証成功: UUIDは登録済みです。")
+        notify("クライアントが接続されました。")
         ws.authenticated = True
         await ws.send(json.dumps({"type": "auth_result", "status": "ok"}))
         return
-    session = AuthSession(uuid=uuid)
-    ws.auth = session
-    logger.info("認証トークン:", session.passkey)
+    
+    ws.auth = AuthSession(uuid=uuid)
+    logger.info(f"認証OTP:{ws.auth.passkey}")
+    notify(f"クライアントから認証要求がありました。\nワンタイムキー:{ws.auth.passkey}", duration=15)
     await ws.send(json.dumps({"type": "auth_needed", "message": "ホストから発行されたワンタイムキーを入力してください。"}))
 
 async def send_auth_needed(ws, message: str, regenerate: bool = True):
@@ -62,7 +66,8 @@ async def send_auth_needed(ws, message: str, regenerate: bool = True):
     if regenerate:
         ws.auth.passkey = onetime_passkey(ws.auth.uuid)
         ws.auth.timestamp = int(time.time())
-        logger.info("認証トークン再発行:", ws.auth.passkey)
+        logger.info(f"認証OTP再発行:{ws.auth.passkey}")
+        notify(f"クライアントから再度認証要求がありました。\nワンタイムキー:{ws.auth.passkey}", duration=15)
 
     await ws.send(json.dumps({
         "type": "auth_needed",
@@ -80,6 +85,7 @@ async def handle_auth_response(ws, onetime: str):
     if status == "ok":
         ws.authenticated = True
         logger.info("認証成功")
+        notify("クライアントが接続されました。")
         if register_uuid(ws.auth.uuid):
             logger.info("UUIDを登録しました。")
         else:

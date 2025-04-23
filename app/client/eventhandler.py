@@ -5,6 +5,8 @@ from client.interactables import trackpad, action, volume
 from logging import getLogger
 logger = getLogger(__name__)
 
+from notifer import notify
+
 HEARTBEAT_INTERVAL = 3  # 秒
 HEARTBEAT_TIMEOUT = 6  # 秒以内にpongが返らなければ切断
 
@@ -24,7 +26,7 @@ async def handle_client(websocket):
                 await asyncio.sleep(HEARTBEAT_INTERVAL)
                 if time.time() - last_pong > HEARTBEAT_TIMEOUT:
                     logger.warning("pongが返ってこないので切断")
-                    await websocket.close()
+                    await websocket.close(code=1001, reason="pong timeout")
                     break
             except websockets.ConnectionClosedOK as e:
                 break
@@ -40,7 +42,7 @@ async def handle_client(websocket):
                 try:
                     data = json.loads(message)
                 except Exception:
-                    logger.error("JSONデコードエラー:", message)
+                    logger.error(f"JSONデコード失敗: {message}")
                     continue
 
                 if not websocket.authenticated:
@@ -67,7 +69,7 @@ async def handle_client(websocket):
                     action.handle_event(data)
                     
                 else:
-                    logger.info("タイプ検知外のメッセージ:", data)
+                    logger.info(f"タイプ検知外のメッセージ:{data}")
                     
         except websockets.ConnectionClosedOK as e:
             if e.code == 1001:
@@ -78,7 +80,7 @@ async def handle_client(websocket):
                 logger.warning(f"切断: 異常終了: {e.code} - {e.reason}")
         except websockets.ConnectionClosedError as e:
             if e.code == 1006:
-                logger.warning("🔌 切断: なんか切れた")
+                logger.warning("切断: なんか切れた")
         except Exception as e:
             e.with_traceback()
             logger.error("Listenエラー:", e)

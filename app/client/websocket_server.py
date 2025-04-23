@@ -1,20 +1,22 @@
 import websockets
 from client.eventhandler import handle_client
 
+from notifer import notify
+
 from logging import getLogger
 logger = getLogger(__name__)
 
 connected_clients = set()
 
 async def handler(websocket):
-    logger.info("クライアント接続:", websocket.remote_address)
+    logger.info(f"クライアント接続: {websocket.remote_address}")
     connected_clients.add(websocket)
 
     websocket.authenticated = False
     await handle_client(websocket)
 
     connected_clients.remove(websocket)
-    logger.info("websocketが廃棄されました:", websocket.remote_address)
+    logger.info(f"websocketが廃棄されました: {websocket.remote_address}")
 
 
 async def run_websocket_server(local_ip: str, port: int = 8765):
