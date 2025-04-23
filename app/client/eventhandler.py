@@ -10,62 +10,74 @@ async def handle_client(websocket):
 
     async def heartbeat():
         nonlocal last_pong
-        try:
-            while True:
-                if not websocket.authenticated:
-                    await asyncio.sleep(HEARTBEAT_INTERVAL)
-                    continue
-                timestamp = int(time.time() * 1000) # ミリ秒に変換
-                ping_msg = json.dumps({"type": "ping", "timestamp": timestamp})
+        while True:
+            if not websocket.authenticated:
+                await asyncio.sleep(HEARTBEAT_INTERVAL)
+                continue
+            timestamp = int(time.time() * 1000) # ミリ秒に変換
+            ping_msg = json.dumps({"type": "ping", "timestamp": timestamp})
+            try:
                 await websocket.send(ping_msg)
                 await asyncio.sleep(HEARTBEAT_INTERVAL)
                 if time.time() - last_pong > HEARTBEAT_TIMEOUT:
                     print("💔 pongが返ってこないので切断")
                     await websocket.close()
                     break
-        except websockets.ConnectionClosed as e:
+            except websockets.ConnectionClosedOK as e:
+                break
+            except:
+                print("💔 ping送信失敗")
+                break
+
+    async def listen():
+        nonlocal last_pong
+        try:
+            async for message in websocket:
+
+                try:
+                    data = json.loads(message)
+                except Exception:
+                    print("🛑 JSONデコードエラー:", message)
+                    continue
+
+                if not websocket.authenticated:
+                    if data.get("type") == "auth_start":
+                        await on_auth_start(websocket, data["uuid"])
+
+                    elif data.get("type") == "auth_response":
+                        success = await handle_auth_response(websocket, data["onetime"])
+                
+                elif data.get("type") == "pong":
+                    now = int(time.time() * 1000)
+                    rtt = now - data["timestamp"]
+                    last_pong = time.time()
+                    await websocket.send(json.dumps({"type": "rtt", "rtt": rtt}))
+                    # print(f"📶 pong受信 RTT: {rtt}ms")
+                
+                elif data.get("type").startswith("tp_"):
+                    trackpad.handle_event(data["type"], data)
+
+                elif data.get("type").startswith("volume_"):
+                    volume.handle_event(data["type"], data)
+                    
+                elif data.get("type") == "action":
+                    action.handle_event(data)
+                    
+                else:
+                    print("📩 通常メッセージ:", data)
+                    
+        except websockets.ConnectionClosedOK as e:
             if e.code == 1001:
                 print("👋 切断: クライアントが離脱")
             elif e.code == 4003:
                 print("🔑 切断: 認証失敗")
             else:
                 print(f"⚠️ 切断: 異常終了: {e.code} - {e.reason}")
+        except websockets.ConnectionClosedError as e:
+            if e.code == 1006:
+                print("🔌 切断: なんか切れた")
         except Exception as e:
-            print("🛑 Heartbeatエラー:", e)
-
-    async def listen():
-        nonlocal last_pong
-        async for message in websocket:
-
-            try:
-                data = json.loads(message)
-            except Exception:
-                continue
-
-            if not websocket.authenticated:
-                if data.get("type") == "auth_start":
-                    await on_auth_start(websocket, data["uuid"])
-
-                elif data.get("type") == "auth_response":
-                    success = await handle_auth_response(websocket, data["onetime"])
-            
-            elif data.get("type") == "pong":
-                now = int(time.time() * 1000)
-                rtt = now - data["timestamp"]
-                last_pong = time.time()
-                await websocket.send(json.dumps({"type": "rtt", "rtt": rtt}))
-                # print(f"📶 pong受信 RTT: {rtt}ms")
-            
-            elif data.get("type").startswith("tp_"):
-                trackpad.handle_event(data["type"], data)
-
-            elif data.get("type").startswith("volume_"):
-                volume.handle_event(data["type"], data)
-                
-            elif data.get("type") == "action":
-                action.handle_event(data)
-                
-            else:
-                print("📩 通常メッセージ:", data)
+            e.with_traceback()
+            print("🛑 Listenエラー:", e)
 
     await asyncio.gather(heartbeat(), listen())
