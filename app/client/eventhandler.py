@@ -45,32 +45,43 @@ async def handle_client(websocket):
                     logger.error(f"JSONデコード失敗: {message}")
                     continue
 
-                if not websocket.authenticated:
-                    if data.get("type") == "auth_start":
-                        await on_auth_start(websocket, data["uuid"])
+                try:
+                    msg_type = data.get("type", None)
+                    if not websocket.authenticated:
+                        if msg_type == "auth_start":
+                            await on_auth_start(websocket, data["uuid"])
 
-                    elif data.get("type") == "auth_response":
-                        success = await handle_auth_response(websocket, data["onetime"])
-                
-                elif data.get("type") == "pong":
-                    now = int(time.time() * 1000)
-                    rtt = now - data["timestamp"]
-                    last_pong = time.time()
-                    await websocket.send(json.dumps({"type": "rtt", "rtt": rtt}))
-                    # logger.info(f"pong受信 RTT: {rtt}ms")
-                
-                elif data.get("type").startswith("tp_"):
-                    trackpad.handle_event(data["type"], data)
+                        elif msg_type == "auth_response":
+                            await handle_auth_response(websocket, data["onetime"])
+                    
+                    elif msg_type == "pong":
+                        now = int(time.time() * 1000)
+                        rtt = now - data["timestamp"]
+                        last_pong = time.time()
+                        await websocket.send(json.dumps({"type": "rtt", "rtt": rtt}))
+                    
+                    elif msg_type.startswith("tp_"):
+                        trackpad.handle_event(data["type"], data)
 
-                elif data.get("type").startswith("volume_"):
-                    volume.handle_event(data["type"], data)
+                    elif msg_type.startswith("volume_"):
+                        volume.handle_event(data["type"], data)
+                        
+                    elif msg_type == "action":
+                        action.handle_action(data)
                     
-                elif data.get("type") == "action":
-                    action.handle_event(data)
-                    
-                else:
-                    logger.info(f"タイプ検知外のメッセージ:{data}")
-                    
+                    elif msg_type == "vk":
+                        action.handle_vk(data)
+
+                    elif msg_type == "get_config":
+                        with open("client_config.json", "r") as f:
+                            config_data = json.load(f)
+                        await websocket.send(json.dumps({"type": "config", "config": config_data}))
+
+                    else:
+                        logger.info(f"タイプ検知外のメッセージ:{data}")
+                except Exception as e:
+                    logger.error(f"メッセージ処理エラー: {e}")
+
         except websockets.ConnectionClosedOK as e:
             if e.code == 1001:
                 logger.info("切断: クライアントが離脱")
@@ -80,9 +91,6 @@ async def handle_client(websocket):
                 logger.warning(f"切断: 異常終了: {e.code} - {e.reason}")
         except websockets.ConnectionClosedError as e:
             if e.code == 1006:
-                logger.warning("切断: なんか切れた")
-        except Exception as e:
-            e.with_traceback()
-            logger.error("Listenエラー:", e)
+                logger.warning("切断: 接続状態が消滅")
 
     await asyncio.gather(heartbeat(), listen())

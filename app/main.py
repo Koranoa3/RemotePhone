@@ -44,6 +44,7 @@ def setup_tray():
 SERVER_URL = "http://skyboxx.tplinkdns.com:8000"
 
 def main():
+    logger.info("アプリケーションが起動しました。")
     success = register(SERVER_URL, port=8765)
     if success:
         local_ip = get_local_ip()

@@ -1,0 +1,136 @@
+{
+    "theme": {
+        "base_theme": "dark"
+    },
+    "trackpad": {
+        "sensitivity": 1,
+        "acceleration": 1.5,
+        "scrollSpeed": 1.2,
+        "doubleClickSpeed": 500
+    },
+    "slider": {
+        "threshold": 10
+    },
+    "layout": [
+        [
+            {
+                "label": "Volume",
+                "type": "slider",
+                "command": "volume_change",
+                "multiplier": 0.2,
+                "position": {
+                    "x": 2,
+                    "y": 1
+                },
+                "size": {
+                    "width": 1,
+                    "height": 2
+                }
+            },
+            {
+                "label": "Up",
+                "type": "action",
+                "command": "up",
+                "position": {
+                    "x": 1,
+                    "y": 2
+                },
+                "size": {
+                    "width": 1,
+                    "height": 1
+                }
+            },
+            {
+                "label": "Down",
+                "type": "action",
+                "command": "down",
+                "position": {
+                    "x": 1,
+                    "y": 3
+                },
+                "size": {
+                    "width": 1,
+                    "height": 1
+                }
+            },
+            {
+                "label": "Left",
+                "type": "action",
+                "command": "left",
+                "position": {
+                    "x": 0,
+                    "y": 2
+                },
+                "size": {
+                    "width": 1,
+                    "height": 1
+                }
+            },
+            {
+                "label": "Right",
+                "type": "action",
+                "command": "right",
+                "position": {
+                    "x": 2,
+                    "y": 2
+                },
+                "size": {
+                    "width": 1,
+                    "height": 1
+                }
+            },
+            {
+                "label": "Win",
+                "type": "vk",
+                "command": 91,
+                "position": {
+                    "x": 0,
+                    "y": 1
+                },
+                "size": {
+                    "width": 1,
+                    "height": 1
+                }
+            },
+            {
+                "label": "Play/Pause",
+                "type": "action",
+                "command": "play_pause",
+                "position": {
+                    "x": 1,
+                    "y": 0
+                },
+                "size": {
+                    "width": 1,
+                    "height": 1
+                }
+            },
+            {
+                "label": "PrevTrack",
+                "type": "action",
+                "command": "prev_track",
+                "position": {
+                    "x": 0,
+                    "y": 0
+                },
+                "size": {
+                    "width": 1,
+                    "height": 1
+                }
+            },
+            {
+                "label": "NextTrack",
+                "type": "action",
+                "command": "next_track",
+                "position": {
+                    "x": 2,
+                    "y": 0
+                },
+                "size": {
+                    "width": 1,
+                    "height": 1
+                }
+            }
+        ]
+    ]
+}
