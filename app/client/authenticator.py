@@ -4,9 +4,9 @@ from dataclasses import dataclass
 from logging import getLogger
 logger = getLogger(__name__)
 
-from notifer import notify
+from app.notifer import notify
 
-registered_uuids_path = os.path.join(os.path.dirname(__file__), "..", "..", "registered_uuids.txt")
+registered_uuids_path = "registered_uuids.txt"
 # --- 認証済みUUID ---
 def if_uuid_registered(uuid: str) -> bool:
     if not os.path.exists(registered_uuids_path):

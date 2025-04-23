@@ -10,7 +10,7 @@ def notify(message, title="RemotePhone", duration=2):
 
     def _show():
         with toast_lock:
-            toaster.show_toast(title, message, duration=duration, threaded=True)
+            toaster.show_toast(title, message, duration=duration, icon_path="icon.ico", threaded=True)
 
     with toast_lock:
         if toast_timer and toast_timer.is_alive():

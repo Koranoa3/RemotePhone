@@ -1,11 +1,11 @@
 import asyncio, time, websockets, json
-from client.authenticator import on_auth_start, handle_auth_response
-from client.interactables import trackpad, action, volume
+from app.client.authenticator import on_auth_start, handle_auth_response
+from app.client.interactables import trackpad, action, volume
 
 from logging import getLogger
 logger = getLogger(__name__)
 
-from notifer import notify
+from app.notifer import notify
 
 HEARTBEAT_INTERVAL = 3  # 秒
 HEARTBEAT_TIMEOUT = 6  # 秒以内にpongが返らなければ切断

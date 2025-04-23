@@ -1,24 +1,25 @@
 import threading, asyncio
-import time
-import json
-
-from notifer import notify
+import time, json, sys, os
 
 from logging import getLogger, config
-with open('log_config.json', 'r') as f:
+def resource_path(relative_path):
+    base_path = getattr(sys, '_MEIPASS', os.path.abspath("."))
+    return os.path.join(base_path, relative_path)
+with open(resource_path("app/log_config.json"), "r", encoding="utf-8") as f:
     log_conf = json.load(f)
 config.dictConfig(log_conf)
 logger = getLogger(__name__)
 logger.info("初期化中...")
 
+from app.notifer import notify
 
 def start_heartbeat_thread(server_url, local_ip):
-    from server.heartbeat import start_heartbeat
+    from app.server.heartbeat import start_heartbeat
     t = threading.Thread(target=start_heartbeat, args=(server_url, local_ip), daemon=True)
     t.start()
 
 def start_websocket_thread(local_ip):
-    from client.websocket_server import run_websocket_server
+    from app.client.websocket_server import run_websocket_server
     threading.Thread(target=lambda: asyncio.run(run_websocket_server(local_ip=local_ip)), daemon=True).start()
 
 
@@ -45,10 +46,10 @@ VERSION = "0.7.0"
 def main():
     logger.info("アプリケーションが起動しました。")
 
-    from server.updater import check_for_updates
+    from app.server.updater import check_for_updates
     check_for_updates(SERVER_URL + "/api/version", VERSION)
 
-    from server.register import register, get_local_ip
+    from app.server.register import register, get_local_ip
     success = register(SERVER_URL, port=8765)
     if success:
         local_ip = get_local_ip()

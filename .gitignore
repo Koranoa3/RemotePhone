@@ -2,3 +2,7 @@
 __pycache__
 registered_uuids.txt
 application.log
+build/
+dist/
+RemotePhoneHost.spec
+build.txt
