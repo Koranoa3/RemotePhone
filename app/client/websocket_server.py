@@ -17,4 +17,12 @@ async def handler(websocket):
 async def run_websocket_server(local_ip: str, port: int = 8765):
     server = await websockets.serve(handler, host="0.0.0.0", port=port)
     print(f"✅ WebSocketサーバー起動中 : ws://{local_ip}:{port}")
-    await server.wait_closed()
+    try:
+        async with server:
+            await server.wait_closed()
+    except:
+        print("🛑 WebSocketサーバーを停止します。")
+        if server:
+            server.close()
+    finally:
+        print("🗑️ WebSocketサーバーが停止しました。")

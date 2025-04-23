@@ -58,6 +58,7 @@ async def send_auth_needed(ws, message: str, regenerate: bool = True):
 
     if regenerate:
         ws.auth.passkey = onetime_passkey(ws.auth.uuid)
+        ws.auth.timestamp = int(time.time())
         print("🔑 認証トークン再発行:", ws.auth.passkey)
 
     await ws.send(json.dumps({
