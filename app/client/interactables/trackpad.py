@@ -4,9 +4,6 @@ import math
 from logging import getLogger
 logger = getLogger(__name__)
 
-MOUSE_SPEED_MULTIPLIER = 1
-MOUSE_ACCELERATION = 1.2
-
 def handle_event(event_type, data):
     if event_type == "tp_tap": # no args
         handle_tap()
@@ -23,8 +20,8 @@ def handle_tap():
     ctypes.windll.user32.mouse_event(0x0004, 0, 0, 0, 0)  # Left button up
 
 def handle_move(data):
-    dx = int(math.copysign(abs(float(data["dx"]) * MOUSE_SPEED_MULTIPLIER) ** MOUSE_ACCELERATION, data["dx"]))
-    dy = int(math.copysign(abs(float(data["dy"]) * MOUSE_SPEED_MULTIPLIER) ** MOUSE_ACCELERATION, data["dy"]))
+    dx = int(data["dx"])
+    dy = int(data["dy"])
     ctypes.windll.user32.mouse_event(0x0001, dx, dy, 0, 0) # Move mouse
 
 def handle_scroll(data):
