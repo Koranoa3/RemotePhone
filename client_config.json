@@ -3,13 +3,10 @@
         "base_theme": "dark"
     },
     "trackpad": {
-        "sensitivity": 1,
+        "sensitivity": 1.0,
         "acceleration": 1.5,
         "scrollSpeed": 1.2,
         "doubleClickSpeed": 500
-    },
-    "slider": {
-        "threshold": 10
     },
     "layout": [
         [
@@ -18,9 +15,11 @@
                 "type": "slider",
                 "command": "volume_change",
                 "multiplier": 0.2,
+                "horizontal": false,
+                "tap": "mute",
                 "position": {
-                    "x": 2,
-                    "y": 1
+                    "x": 3,
+                    "y": 2
                 },
                 "size": {
                     "width": 1,
@@ -32,8 +31,8 @@
                 "type": "action",
                 "command": "up",
                 "position": {
-                    "x": 1,
-                    "y": 2
+                    "x": 2,
+                    "y": 3
                 },
                 "size": {
                     "width": 1,
@@ -45,8 +44,8 @@
                 "type": "action",
                 "command": "down",
                 "position": {
-                    "x": 1,
-                    "y": 3
+                    "x": 2,
+                    "y": 4
                 },
                 "size": {
                     "width": 1,
@@ -58,8 +57,8 @@
                 "type": "action",
                 "command": "left",
                 "position": {
-                    "x": 0,
-                    "y": 2
+                    "x": 1,
+                    "y": 4
                 },
                 "size": {
                     "width": 1,
@@ -71,7 +70,33 @@
                 "type": "action",
                 "command": "right",
                 "position": {
-                    "x": 2,
+                    "x": 3,
+                    "y": 4
+                },
+                "size": {
+                    "width": 1,
+                    "height": 1
+                }
+            },
+            {
+                "label": "Ctrl",
+                "type": "action",
+                "command": "ctrl",
+                "position": {
+                    "x": 1,
+                    "y": 3
+                },
+                "size": {
+                    "width": 1,
+                    "height": 1
+                }
+            },
+            {
+                "label": "Shift",
+                "type": "action",
+                "command": "shift",
+                "position": {
+                    "x": 1,
                     "y": 2
                 },
                 "size": {
@@ -80,12 +105,12 @@
                 }
             },
             {
-                "label": "Win",
-                "type": "vk",
-                "command": 91,
+                "label": "Alt",
+                "type": "action",
+                "command": "alt",
                 "position": {
-                    "x": 0,
-                    "y": 1
+                    "x": 2,
+                    "y": 2
                 },
                 "size": {
                     "width": 1,
@@ -97,8 +122,8 @@
                 "type": "action",
                 "command": "play_pause",
                 "position": {
-                    "x": 1,
-                    "y": 0
+                    "x": 2,
+                    "y": 1
                 },
                 "size": {
                     "width": 1,
@@ -110,8 +135,8 @@
                 "type": "action",
                 "command": "prev_track",
                 "position": {
-                    "x": 0,
-                    "y": 0
+                    "x": 1,
+                    "y": 1
                 },
                 "size": {
                     "width": 1,
@@ -123,11 +148,71 @@
                 "type": "action",
                 "command": "next_track",
                 "position": {
-                    "x": 2,
-                    "y": 0
+                    "x": 3,
+                    "y": 1
                 },
                 "size": {
                     "width": 1,
+                    "height": 1
+                }
+            }
+        ],
+        [
+            {
+                "label": "PrevDesktop",
+                "type": "action",
+                "command": "prev_virtual_desktop",
+                "position": {
+                    "x": 1,
+                    "y": 3
+                },
+                "size": {
+                    "width": 1,
+                    "height": 1
+                }
+            },
+            {
+                "label": "NextDesktop",
+                "type": "action",
+                "action": "action",
+                "command": "next_virtual_desktop",
+                "position": {
+                    "x": 3,
+                    "y": 3
+                },
+                "size": {
+                    "width": 1,
+                    "height": 1
+                }
+            },
+            {
+                "label": "Volume",
+                "type": "slideaction",
+                "command": {
+                    "positive": ["shift", "ctrl", "tab"],
+                    "negative": ["ctrl", "tab"]
+                },
+                "threshold": 30,
+                "tap": "mute",
+                "position": {
+                    "x": 2,
+                    "y": 2
+                },
+                "size": {
+                    "width": 1,
+                    "height": 2
+                }
+            },
+            {
+                "label": "Esc",
+                "type": "vk",
+                "command": [91, 9],
+                "position": {
+                    "x": 1,
+                    "y": 4
+                },
+                "size": {
+                    "width": 3,
                     "height": 1
                 }
             }

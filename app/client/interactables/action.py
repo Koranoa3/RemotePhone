@@ -72,33 +72,58 @@ def hotkey(key_codes:list):
     except Exception as e:
         logger.error(f"Error pressing hotkey {key_codes}: {e}")
 
+def resolve_action(action):
+    if isinstance(action, list):
+        result = []
+        for a in action:
+            resolved = ACTIONS.get(a, a if isinstance(a, int) else None)
+            if isinstance(resolved, list):
+                result.extend(resolved)
+            elif isinstance(resolved, int):
+                result.append(resolved)
+            else:
+                logger.warning(f"Unknown action element: {a}")
+                return None
+        return result
+    elif isinstance(action, str):
+        resolved = ACTIONS.get(action, None)
+        if isinstance(resolved, list):
+            return resolved
+        elif isinstance(resolved, int):
+            return [resolved]
+        else:
+            logger.warning(f"Unknown action: {action}")
+            return None
+    elif isinstance(action, int):
+        return [action]
+    else:
+        logger.warning(f"Invalid action type: {action}")
+        return None
+
+
 def handle_action(data):
     action = data.get("action", None)
-    if action is None or type(action) != str:
+    if action is None:
         logger.warning(f"Invalid command: {action}")
         return
 
-    key_code = ACTIONS.get(action, None)
-    if key_code is None:
-        logger.warning(f"Unknown action command: {action}")
+    pressure = data.get("pressure", "press") # "press" / "down" / "up"
+    key_codes = resolve_action(action)
+    if key_codes is None:
         return
 
-    pressure = data.get("pressure", "press") # "press" / "down" / "up"
-    if isinstance(key_code, list):
-        if not pressure == "up":
-            hotkey(key_code)
-    elif pressure == "down":
-        key_down(key_code)
+    if pressure == "down":
+        for code in key_codes:
+            key_down(code)
     elif pressure == "up":
-        if key_code in NO_KEYUP_ACTIONS:
-            return
-        key_up(key_code)
-    elif pressure != "press":
-        logger.warning(f"Invalid pressure value: {pressure}")
-        return
-    
+        for code in key_codes:
+            if code not in NO_KEYUP_ACTIONS:
+                key_up(code)
+    elif pressure == "press":
+        hotkey(key_codes)
     else:
-        press_key(key_code)
+        logger.warning(f"Invalid pressure value: {pressure}")
+
 
 def handle_vk(data):
     key_code = data.get("vk", None)
