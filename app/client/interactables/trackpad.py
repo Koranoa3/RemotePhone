@@ -1,12 +1,23 @@
 import ctypes
-import math
 
 from logging import getLogger
 logger = getLogger(__name__)
 
+BUTTONS_DOWN = {
+    "left": 0x0002,
+    "right": 0x0008,
+    "middle": 0x0020,
+}
+BUTTONS_UP = {
+    "left": 0x0004,
+    "right": 0x0010,
+    "middle": 0x0040,
+}
+
+
 def handle_event(event_type, data):
-    if event_type == "tp_tap": # no args
-        handle_tap()
+    if event_type == "tp_tap": # pressure, button
+        handle_tap(data)
     elif event_type == "tp_move": # dx, dy
         handle_move(data)
     elif event_type == "tp_scroll": # is_horiz, delta
@@ -15,9 +26,24 @@ def handle_event(event_type, data):
         logger.warning(f"Unknown event type: {event_type}")
 
 
-def handle_tap():
-    ctypes.windll.user32.mouse_event(0x0002, 0, 0, 0, 0)  # Left button down
-    ctypes.windll.user32.mouse_event(0x0004, 0, 0, 0, 0)  # Left button up
+def handle_tap(data):
+    pressure = data.get("pressure", "click") # click / up / down
+    button = data.get("button", "left") # left / right / middle
+    
+    if button not in BUTTONS_DOWN:
+        logger.warning(f"Unknown button: {button}")
+        return    
+    
+    if pressure == "click":
+        ctypes.windll.user32.mouse_event(BUTTONS_DOWN[button], 0, 0, 0, 0)  # Button down
+        ctypes.windll.user32.mouse_event(BUTTONS_UP[button], 0, 0, 0, 0)    # Button up
+    elif pressure == "down":
+        ctypes.windll.user32.mouse_event(BUTTONS_DOWN[button], 0, 0, 0, 0)
+    elif pressure == "up":
+        ctypes.windll.user32.mouse_event(BUTTONS_UP[button], 0, 0, 0, 0)
+    else:
+        logger.warning(f"Unknown pressure state: {pressure}")
+
 
 def handle_move(data):
     dx = int(data["dx"])

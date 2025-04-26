@@ -5,7 +5,7 @@
     "trackpad": {
         "sensitivity": 1.0,
         "acceleration": 1.5,
-        "scrollSpeed": 1.2,
+        "scrollSpeed": 3.0,
         "doubleClickSpeed": 500
     },
     "layout": [

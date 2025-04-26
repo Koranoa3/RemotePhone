@@ -41,7 +41,7 @@ def on_quit(icon, item):
 
 
 SERVER_URL = "http://skyboxx.tplinkdns.com:8000"
-VERSION = "0.7.0"
+VERSION = "0.7.2"
 
 def main():
     logger.info("アプリケーションが起動しました。")
