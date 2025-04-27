@@ -1,73 +1,103 @@
-import sys
 import os
-import requests
-import time
+import re
 import shutil
+import zipfile
+import requests
 import subprocess
-import tkinter as tk
-from tkinter import ttk, messagebox
+import time
 
-def download_file(url, dest_path, progress_callback=None):
-    response = requests.get(url, stream=True)
-    total = int(response.headers.get('content-length', 0))
-    downloaded = 0
+# 設定
+VERSION_INFO_URL = "http://skyboxx.tplinkdns.com:8000/api/releases/latest/version"
+DOWNLOAD_URL = "http://skyboxx.tplinkdns.com:8000/api/releases/latest/download"
+TEMP_DIR = "temp"
+APP_DIR_PREFIX = "app-"
+EXE_NAME = "RemotePhoneHost.exe"
+MAX_RETRIES = 10
 
-    with open(dest_path + ".tmp", "wb") as f:
-        for data in response.iter_content(chunk_size=4096):
-            f.write(data)
-            downloaded += len(data)
-            if progress_callback:
-                progress_callback(downloaded, total)
+def get_current_version():
+    app_dirs = [d for d in os.listdir(".") if os.path.isdir(d) and d.startswith(APP_DIR_PREFIX)]
+    versions = []
+    pattern = re.compile(r"app-(v\d+\.\d+\.\d+)")
+    for d in app_dirs:
+        match = pattern.match(d)
+        if match:
+            versions.append((match.group(1), d))
+    if not versions:
+        return None, None
+    versions.sort(reverse=True)
+    return versions[0][0], versions[0][1]
 
-    # ダウンロード完了後に本番ファイルへリネーム
-    os.replace(dest_path + ".tmp", dest_path)
+def get_latest_version():
+    try:
+        res = requests.get(VERSION_INFO_URL, timeout=5)
+        res.raise_for_status()
+        data = res.json()
+        return data.get("version")
+    except Exception as e:
+        print(f"[Error] 最新バージョン取得失敗: {e}")
+        return None
+
+def download_update(zip_path):
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            res = requests.get(DOWNLOAD_URL, timeout=10)
+            res.raise_for_status()
+            with open(zip_path, "wb") as f:
+                f.write(res.content)
+            return True
+        except Exception as e:
+            print(f"[Retry {attempt}] ダウンロード失敗: {e}")
+            time.sleep(min(2 ** attempt, 60))  # 指数バックオフ、最大60秒待機
+    return False
+
+def extract_zip(zip_path, extract_to):
+    with zipfile.ZipFile(zip_path, "r") as zip_ref:
+        zip_ref.extractall(extract_to)
+
+def launch_new_app(app_path):
+    try:
+        subprocess.Popen([app_path], shell=False)
+    except Exception as e:
+        print(f"[Error] 新アプリ起動失敗: {e}")
 
 def main():
-    # コマンドライン引数受け取り
-    if len(sys.argv) < 3:
-        messagebox.showerror("エラー", "引数が不足しています。\nurlとdestパスが必要です。")
-        sys.exit(1)
+    # tempディレクトリ初期化
+    if os.path.exists(TEMP_DIR):
+        shutil.rmtree(TEMP_DIR)
+    os.makedirs(TEMP_DIR, exist_ok=True)
 
-    url = sys.argv[1]   # ダウンロードURL
-    dest_path = sys.argv[2]  # 保存先ファイルパス (例: RemotePhone.exe)
+    current_version, current_dir = get_current_version()
+    print(f"現行バージョン: {current_version if current_version else 'なし'}")
 
-    # GUIセットアップ
-    root = tk.Tk()
-    root.title("アップデート中...")
-    root.geometry("400x100")
-    root.resizable(False, False)
+    latest_version = get_latest_version()
+    if not latest_version:
+        print("[Abort] 最新バージョン取得に失敗")
+        return
 
-    label = ttk.Label(root, text="ダウンロード中...")
-    label.pack(pady=10)
+    print(f"最新バージョン: {latest_version}")
 
-    progress = ttk.Progressbar(root, length=300, mode='determinate')
-    progress.pack(pady=5)
+    if current_version == latest_version:
+        print("すでに最新バージョンです。起動します。")
+        new_app_path = os.path.join(current_dir, EXE_NAME)
+        launch_new_app(new_app_path)
+        return
 
-    def update_progress(downloaded, total):
-        percent = int(downloaded / total * 100)
-        progress['value'] = percent
-        root.update_idletasks()
+    # アップデート処理
+    print("アップデートを開始します。")
+    zip_path = os.path.join(TEMP_DIR, "update.zip")
+    if not download_update(zip_path):
+        print("[Abort] ダウンロード失敗。アップデートを中止します。")
+        return
 
-    # ダウンロード実行
-    try:
-        download_file(url, dest_path, progress_callback=update_progress)
-    except Exception as e:
-        messagebox.showerror("エラー", f"ダウンロード中にエラー発生:\n{str(e)}")
-        sys.exit(1)
+    new_dir = f"{APP_DIR_PREFIX}{latest_version}"
+    if os.path.exists(new_dir):
+        shutil.rmtree(new_dir)
 
-    # ダウンロード完了
-    label.config(text="インストール完了！起動します...")
+    extract_zip(zip_path, new_dir)
+    print("アップデート完了。新しいバージョンを起動します。")
 
-    # アプリ起動
-    try:
-        subprocess.Popen([dest_path])
-    except Exception as e:
-        messagebox.showerror("エラー", f"起動に失敗しました:\n{str(e)}")
-        sys.exit(1)
-
-    time.sleep(1)
-    root.destroy()
-    sys.exit(0)
+    new_app_path = os.path.join(new_dir, EXE_NAME)
+    launch_new_app(new_app_path)
 
 if __name__ == "__main__":
     main()

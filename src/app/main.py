@@ -7,13 +7,13 @@ from logging import getLogger, config
 def resource_path(relative_path):
     base_path = getattr(sys, '_MEIPASS', os.path.abspath("."))
     return os.path.join(base_path, relative_path)
-with open(resource_path("src/app/log_config.json"), "r", encoding="utf-8") as f:
+with open(resource_path("app/log_config.json"), "r", encoding="utf-8") as f:
     log_conf = json.load(f)
 config.dictConfig(log_conf)
 logger = getLogger(__name__)
 logger.info("初期化中...")
 
-from src.app.notifer import notify
+from app.notifer import notify
 
 ### core process thread ###############################
 
@@ -25,19 +25,19 @@ def start_heartbeat_thread(server_url, local_ip):
         logger.info("ハートビートスレッドは既に起動中です。")
         return
 
-    from src.app.server.heartbeat import start_heartbeat
+    from app.server.heartbeat import start_heartbeat
     heartbeat_thread = threading.Thread(target=start_heartbeat, args=(server_url, local_ip), daemon=True)
     heartbeat_thread.start()
 
 def start_websocket_thread(local_ip):
-    from src.app.client.websocket_server import run_websocket_server
+    from app.client.websocket_server import run_websocket_server
     threading.Thread(target=lambda: asyncio.run(run_websocket_server(local_ip=local_ip)), daemon=True).start()
 
 register_lock = threading.Lock()
 def register_with_retry():
     global connection_status
 
-    from src.app.server.register import register, get_local_ip
+    from app.server.register import register, get_local_ip
 
     connection_status = "接続中"
     update_tray()
@@ -117,15 +117,9 @@ def on_quit(icon, item):
 ### main function ###############################
 
 SERVER_URL = "http://skyboxx.tplinkdns.com:8000"
-VERSION = "v0.7.0"
 
 def main():
     logger.info("アプリケーションが起動しました。")
-
-    from src.app.server.updater import is_update_available
-    if is_update_available(VERSION):
-        notify("新しいバージョンが見つかりました。")
-        time.sleep(3)
 
     # まずトレイアイコンを即セットアップ
     icon = setup_tray()
