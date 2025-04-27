@@ -2,11 +2,15 @@
     "theme": {
         "base_theme": "dark"
     },
+    "button": {
+        "holdTime": 300,
+        "holdClickInterval": 50
+    },
     "trackpad": {
         "sensitivity": 1.0,
-        "acceleration": 1.5,
+        "acceleration": 1.7,
         "scrollSpeed": 3.0,
-        "doubleClickSpeed": 500
+        "doubleClickSpeed": 200
     },
     "layout": [
         [
