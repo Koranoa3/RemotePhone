@@ -20,24 +20,23 @@ async def handler(websocket):
     logger.info(f"websocketが廃棄されました: {websocket.remote_address}")
 
 
-websocket_server_task = None
+websocket_server = None
 async def run_websocket_server(local_ip: str, port: int = 8765):
-    global websocket_server_task
-
-    if websocket_server_task and not websocket_server_task.done():
-        logger.info("WebSocketサーバーは既に起動中です。")
+    global websocket_server
+    if websocket_server:
+        logger.info("WebSocketサーバーは既に起動しています。")
         return
-
-    async def server_task():
-        logger.info("WebSocketサーバーを起動中...")
-        server = await websockets.serve(handler, host="0.0.0.0", port=port)
-        logger.info(f"WebSocketサーバー起動 : ws://{local_ip}:{port}")
-        try:
-            async with server:
-                await server.wait_closed()
-        except Exception as e:
-            logger.error(f"WebSocketサーバーエラー: {e}")
-        finally:
-            logger.info("WebSocketサーバーが停止しました。")
-
-    websocket_server_task = asyncio.create_task(server_task())
+    
+    websocket_server = await websockets.serve(handler, host="0.0.0.0", port=port)
+    logger.info(f"WebSocketサーバー起動中 : ws://{local_ip}:{port}")
+    try:
+        async with websocket_server:
+            await websocket_server.wait_closed()
+    except:
+        logger.info("WebSocketサーバーを停止します。")
+        if websocket_server:
+            websocket_server.close()
+            await websocket_server.wait_closed()
+            websocket_server = None
+    finally:
+        logger.info("WebSocketサーバーが停止しました。")
