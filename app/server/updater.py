@@ -3,24 +3,32 @@ import requests
 from logging import getLogger
 logger = getLogger(__name__)
 
-def check_for_updates(address: str, current_version: str) -> None:
-    """
-    Check for updates to the application.
-    """
-    logger.info("アップデートを確認中...")
-    try:
-        res = requests.get(address)
-        res.raise_for_status()
-        update_info = res.json()
-        if update_info.get("version") != current_version:
-            logger.info("アップデートが利用可能です。")
-            logger.info(f"新しいバージョン: {update_info.get('version')}")
-            logger.info(f"リリースURL: {update_info.get('download_url', '不明')}")
-        else:
-            logger.info("最新のバージョンです。")
-    except requests.exceptions.RequestException as e:
-        logger.error(f"アップデート確認失敗: {type(e.__cause__)}")
-    except Exception as e:
-        logger.error("アップデート確認失敗:", e)
+# 自分のバージョン
 
-    
+def parse_version(v):
+    return [int(x) for x in v.lstrip('v').split('.')]
+
+def get_latest_release_tag(repo):
+    url = f"https://api.github.com/repos/{repo}/releases"
+    response = requests.get(url, timeout=10)
+    response.raise_for_status()
+    releases = response.json()
+    for release in releases:
+        if not release.get("prerelease", False):
+            return release["tag_name"]
+    return None
+
+def is_update_available(current_version) -> bool:
+    repo = "KoralMint/RemotePhone"
+    latest_tag = get_latest_release_tag(repo)
+    if latest_tag is None:
+        logger.info("正式リリースが見つかりませんでした。")
+        return
+
+    if parse_version(latest_tag) > parse_version(current_version):
+        logger.info(f"アップデート可能！ 最新版は {latest_tag}")
+    else:
+        logger.info("最新バージョンです。")
+
+if __name__ == "__main__":
+    is_update_available()
