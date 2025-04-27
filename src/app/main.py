@@ -85,7 +85,7 @@ def setup_tray():
 
     icon = pystray.Icon(
         "RemotePhone",
-        Image.open("icon.ico"),
+        Image.open("app.ico"),
         menu=generate_menu()
     )
     tray_icon = icon
