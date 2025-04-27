@@ -1,10 +1,14 @@
-import os
+import os, sys
 import re
 import shutil
 import zipfile
 import requests
 import subprocess
 import time
+import tkinter as tk
+import threading
+import atexit
+import tempfile
 
 # 設定
 VERSION_INFO_URL = "http://skyboxx.tplinkdns.com:8000/api/releases/latest/version"
@@ -13,6 +17,9 @@ TEMP_DIR = "temp"
 APP_DIR_PREFIX = "app-"
 EXE_NAME = "RemotePhoneHost.exe"
 MAX_RETRIES = 10
+LOCK_FILE = os.path.join(tempfile.gettempdir(), 'updater.lock')
+
+# --- アップデート処理 ---
 
 def get_current_version():
     app_dirs = [d for d in os.listdir(".") if os.path.isdir(d) and d.startswith(APP_DIR_PREFIX)]
@@ -37,7 +44,7 @@ def get_latest_version():
         print(f"[Error] 最新バージョン取得失敗: {e}")
         return None
 
-def download_update(zip_path):
+def download_update(zip_path, window):
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             res = requests.get(DOWNLOAD_URL, timeout=10)
@@ -47,7 +54,10 @@ def download_update(zip_path):
             return True
         except Exception as e:
             print(f"[Retry {attempt}] ダウンロード失敗: {e}")
-            time.sleep(min(2 ** attempt, 60))  # 指数バックオフ、最大60秒待機
+            wait_time = min(2 ** attempt, 60)
+            for remaining in range(wait_time, 0, -1):
+                window.set_status(f"ダウンロード失敗。{remaining}秒後に再試行します...")
+                time.sleep(1)
     return False
 
 def extract_zip(zip_path, extract_to):
@@ -60,12 +70,52 @@ def launch_new_app(app_path):
     except Exception as e:
         print(f"[Error] 新アプリ起動失敗: {e}")
 
+# --- 多重起動防止防止 ---
+
+def create_lock():
+    if os.path.exists(LOCK_FILE):
+        print("すでに起動しています。終了します。")
+        sys.exit(1)
+    with open(LOCK_FILE, 'w') as f:
+        f.write(str(os.getpid()))
+    atexit.register(remove_lock)
+
+def remove_lock():
+    if os.path.exists(LOCK_FILE):
+        os.remove(LOCK_FILE)
+
+# --- ステータスウィンドウ ---
+class UpdaterWindow:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("RemotePhone Launcher")
+        self.root.iconbitmap(default="app.ico")
+        self.root.geometry("400x200")
+        self.root.resizable(False, False)
+        self.root.attributes('-topmost', True)
+
+        self.label = tk.Label(self.root, text="初期化中...", font=("Arial", 16))
+        self.label.pack(expand=True)
+
+    def set_status(self, text):
+        self.label.config(text=text)
+        self.root.update()
+
+    def run_in_thread(self):
+        threading.Thread(target=self.root.mainloop, daemon=True).start()
+
+    def close(self):
+        self.root.destroy()
+
 def main():
     # tempディレクトリ初期化
     if os.path.exists(TEMP_DIR):
         shutil.rmtree(TEMP_DIR)
     os.makedirs(TEMP_DIR, exist_ok=True)
+    window = UpdaterWindow()
+    window.run_in_thread()
 
+    window.set_status("アップデートを確認中...")
     current_version, current_dir = get_current_version()
     print(f"現行バージョン: {current_version if current_version else 'なし'}")
 
@@ -76,28 +126,35 @@ def main():
 
     print(f"最新バージョン: {latest_version}")
 
-    if current_version == latest_version:
-        print("すでに最新バージョンです。起動します。")
-        new_app_path = os.path.join(current_dir, EXE_NAME)
+    app_dir = current_dir if current_version else None
+    if not current_version == latest_version:
+        # アップデート処理
+        print("アップデートを開始します。")
+        window.set_status("アップデートをダウンロード中...")
+        zip_path = os.path.join(TEMP_DIR, "update.zip")
+        if download_update(zip_path, window):
+            app_dir = f"{APP_DIR_PREFIX}{latest_version}"
+            if os.path.exists(app_dir):
+                shutil.rmtree(app_dir)
+
+            window.set_status("展開中...")
+            extract_zip(zip_path, app_dir)
+            print("アップデート完了。新しいバージョンを起動します。")
+        else:
+            print("[Abort] アップデートのダウンロードに失敗")
+    else:
+        print("最新バージョンです。")
+
+    if app_dir and os.path.exists(app_dir):
+        window.set_status("起動中...")
+        new_app_path = os.path.join(app_dir, EXE_NAME)
         launch_new_app(new_app_path)
-        return
-
-    # アップデート処理
-    print("アップデートを開始します。")
-    zip_path = os.path.join(TEMP_DIR, "update.zip")
-    if not download_update(zip_path):
-        print("[Abort] ダウンロード失敗。アップデートを中止します。")
-        return
-
-    new_dir = f"{APP_DIR_PREFIX}{latest_version}"
-    if os.path.exists(new_dir):
-        shutil.rmtree(new_dir)
-
-    extract_zip(zip_path, new_dir)
-    print("アップデート完了。新しいバージョンを起動します。")
-
-    new_app_path = os.path.join(new_dir, EXE_NAME)
-    launch_new_app(new_app_path)
+    else:
+        print("アプリケーションが見つかりません。")
+        window.set_status("アプリケーションが見つかりません。")    
+    
+    window.close()
 
 if __name__ == "__main__":
+    create_lock()
     main()
