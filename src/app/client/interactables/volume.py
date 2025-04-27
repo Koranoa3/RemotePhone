@@ -1,4 +1,4 @@
-from app.client.interactables import volume_controller as vc
+from src.app.client.interactables import volume_controller as vc
 import time
 
 last_time = time.time()

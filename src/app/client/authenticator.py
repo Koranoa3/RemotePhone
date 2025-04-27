@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from logging import getLogger
 logger = getLogger(__name__)
 
-from app.notifer import notify
+from src.app.notifer import notify
 
 registered_uuids_path = "registered_uuids.txt"
 # --- 認証済みUUID ---
