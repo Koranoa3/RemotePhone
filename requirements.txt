@@ -7,4 +7,3 @@ pycaw
 pystray
 pillow
 win10toast
-tkinter

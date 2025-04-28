@@ -109,7 +109,7 @@ def on_reconnect(icon, item):
             register_with_retry()
 
     threading.Thread(target=reconnect, daemon=True).start()
-    
+
 def on_quit(icon, item):
     logger.info("終了処理が呼ばれました。")
     icon.stop()
@@ -120,6 +120,14 @@ SERVER_URL = "http://skyboxx.tplinkdns.com:8000"
 
 def main():
     logger.info("アプリケーションが起動しました。")
+
+    # コマンドライン引数からserverurlを取得
+    if len(sys.argv) > 1:
+        global SERVER_URL
+        SERVER_URL = sys.argv[1]
+        logger.info(f"コマンドライン引数からサーバーURLを設定しました: {SERVER_URL}")
+    else:
+        logger.info(f"デフォルトのサーバーURLを使用します: {SERVER_URL}")
 
     # まずトレイアイコンを即セットアップ
     icon = setup_tray()
