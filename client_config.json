@@ -8,7 +8,7 @@
     },
     "trackpad": {
         "sensitivity": 1.0,
-        "acceleration": 1.7,
+        "acceleration": 1.6,
         "scrollSpeed": 3.0,
         "doubleClickSpeed": 200
     },
@@ -31,7 +31,7 @@
                 }
             },
             {
-                "label": "Up",
+                "label": "▲",
                 "type": "action",
                 "command": "up",
                 "position": {
@@ -44,7 +44,7 @@
                 }
             },
             {
-                "label": "Down",
+                "label": "▼",
                 "type": "action",
                 "command": "down",
                 "position": {
@@ -57,7 +57,7 @@
                 }
             },
             {
-                "label": "Left",
+                "label": "◀",
                 "type": "action",
                 "command": "left",
                 "position": {
@@ -70,51 +70,12 @@
                 }
             },
             {
-                "label": "Right",
+                "label": "▶",
                 "type": "action",
                 "command": "right",
                 "position": {
                     "x": 3,
                     "y": 4
-                },
-                "size": {
-                    "width": 1,
-                    "height": 1
-                }
-            },
-            {
-                "label": "Ctrl",
-                "type": "action",
-                "command": "ctrl",
-                "position": {
-                    "x": 1,
-                    "y": 3
-                },
-                "size": {
-                    "width": 1,
-                    "height": 1
-                }
-            },
-            {
-                "label": "Shift",
-                "type": "action",
-                "command": "shift",
-                "position": {
-                    "x": 1,
-                    "y": 2
-                },
-                "size": {
-                    "width": 1,
-                    "height": 1
-                }
-            },
-            {
-                "label": "Alt",
-                "type": "action",
-                "command": "alt",
-                "position": {
-                    "x": 2,
-                    "y": 2
                 },
                 "size": {
                     "width": 1,
@@ -163,60 +124,80 @@
         ],
         [
             {
-                "label": "PrevDesktop",
-                "type": "action",
-                "command": "prev_virtual_desktop",
+                "label": "Virtual Desktop",
+                "type": "slideaction",
+                "command": {
+                    "type": "action",
+                    "positive": "next_virtual_desktop",
+                    "negative": "prev_virtual_desktop",
+                    "tap": ["win", "tab"]
+                },
+                "threshold": 60,
+                "horizontal": true,
+                "position": {
+                    "x": 1,
+                    "y": 1
+                },
+                "size": {
+                    "width": 3,
+                    "height": 1
+                }
+            },
+            {
+                "label": "Browser Tab",
+                "type": "slideaction",
+                "command": {
+                    "type": "action",
+                    "positive": ["ctrl", "tab"],
+                    "negative": ["shift", "ctrl", "tab"]
+                },
+                "threshold": 30,
+                "horizontal": true,
                 "position": {
                     "x": 1,
                     "y": 3
                 },
                 "size": {
-                    "width": 1,
+                    "width": 3,
                     "height": 1
                 }
             },
             {
-                "label": "NextDesktop",
+                "label": "Back",
                 "type": "action",
-                "action": "action",
-                "command": "next_virtual_desktop",
-                "position": {
-                    "x": 3,
-                    "y": 3
-                },
-                "size": {
-                    "width": 1,
-                    "height": 1
-                }
-            },
-            {
-                "label": "Volume",
-                "type": "slideaction",
-                "command": {
-                    "positive": ["shift", "ctrl", "tab"],
-                    "negative": ["ctrl", "tab"]
-                },
-                "threshold": 30,
-                "tap": "mute",
-                "position": {
-                    "x": 2,
-                    "y": 2
-                },
-                "size": {
-                    "width": 1,
-                    "height": 2
-                }
-            },
-            {
-                "label": "Esc",
-                "type": "vk",
-                "command": [91, 9],
+                "command": ["alt", "left"],
                 "position": {
                     "x": 1,
                     "y": 4
                 },
                 "size": {
-                    "width": 3,
+                    "width": 1,
+                    "height": 1
+                }
+            },
+            {
+                "label": "Forward",
+                "type": "action",
+                "command": ["alt", "right"],
+                "position": {
+                    "x": 3,
+                    "y": 4
+                },
+                "size": {
+                    "width": 1,
+                    "height": 1
+                }
+            },
+            {
+                "label": "New Tab",
+                "type": "action",
+                "command": ["ctrl", "t"],
+                "position": {
+                    "x": 2,
+                    "y": 4
+                },
+                "size": {
+                    "width": 1,
                     "height": 1
                 }
             }

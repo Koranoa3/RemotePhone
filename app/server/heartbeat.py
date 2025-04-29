@@ -13,4 +13,4 @@ def start_heartbeat(server_url: str, local_ip: str):
             logger.warning(f"サーバーハートビート失敗: {type(e.__cause__)}")
         except Exception as e:
             logger.warning("サーバーハートビート失敗。サーバーに接続できませんでした")
-        time.sleep(60)
+        time.sleep(120)

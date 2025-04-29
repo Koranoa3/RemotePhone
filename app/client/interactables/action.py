@@ -41,7 +41,7 @@ ACTIONS = {
     "left": win32con.VK_LEFT,
     "right": win32con.VK_RIGHT,
 
-    **{chr(i): i for i in range(0x41, 0x5B)},  # A-Z
+    **{chr(i).lower(): i for i in range(0x41, 0x5B)},  # a-z
     **{chr(i): i for i in range(0x30, 0x3A)},  # 0-9
 
     "f1": win32con.VK_F1,
@@ -109,6 +109,12 @@ def hotkey(key_codes:list):
         logger.error(f"Error pressing hotkey {key_codes}: {e}")
 
 def resolve_action(action):
+    if isinstance(action, str) and (action.startswith("[") or action.startswith("{")):
+        try:
+            action = json.loads(action)
+        except json.JSONDecodeError as e:
+            logger.error(f"Error parsing JSON action: {e}")
+
     if isinstance(action, list):
         result = []
         for a in action:
