@@ -8,8 +8,8 @@ KEYEVENTF_KEYDOWN = 0x0000
 KEYEVENTF_KEYUP = 0x0002
 
 ACTIONS = {
-    "volume_up": win32con.VK_VOLUME_UP,
-    "volume_down": win32con.VK_VOLUME_DOWN,
+    "key_volume_up": win32con.VK_VOLUME_UP,
+    "key_volume_down": win32con.VK_VOLUME_DOWN,
     "play_pause": win32con.VK_MEDIA_PLAY_PAUSE,
     "next_track": win32con.VK_MEDIA_NEXT_TRACK,
     "prev_track": win32con.VK_MEDIA_PREV_TRACK,
@@ -20,20 +20,56 @@ ACTIONS = {
     "screenshot": win32con.VK_SNAPSHOT,
 
     "win": win32con.VK_LWIN,
+    "windows": win32con.VK_LWIN, #alternative
     "esc": win32con.VK_ESCAPE,
+    "escape": win32con.VK_ESCAPE, #alternative
     "enter": win32con.VK_RETURN,
+    "return": win32con.VK_RETURN, #alternative
     "space": win32con.VK_SPACE,
     "backspace": win32con.VK_BACK,
-    "delete": win32con.VK_DELETE,
     "tab": win32con.VK_TAB,
     "ctrl": win32con.VK_LCONTROL,
     "shift": win32con.VK_LSHIFT,
     "alt": win32con.VK_LMENU,
 
+    "prev": win32con.VK_PRIOR,
+    "previous": win32con.VK_PRIOR, #alternative
+    "next": win32con.VK_NEXT,
+
     "up": win32con.VK_UP,
     "down": win32con.VK_DOWN,
     "left": win32con.VK_LEFT,
     "right": win32con.VK_RIGHT,
+
+    **{chr(i): i for i in range(0x41, 0x5B)},  # A-Z
+    **{chr(i): i for i in range(0x30, 0x3A)},  # 0-9
+
+    "f1": win32con.VK_F1,
+    "f2": win32con.VK_F2,
+    "f3": win32con.VK_F3,
+    "f4": win32con.VK_F4,
+    "f5": win32con.VK_F5,
+    "f6": win32con.VK_F6,
+    "f7": win32con.VK_F7,
+    "f8": win32con.VK_F8,
+    "f9": win32con.VK_F9,
+    "f10": win32con.VK_F10,
+    "f11": win32con.VK_F11,
+    "f12": win32con.VK_F12,
+
+    "insert": win32con.VK_INSERT,
+    "delete": win32con.VK_DELETE,
+    "home": win32con.VK_HOME,
+    "end": win32con.VK_END,
+    "page_up": win32con.VK_PRIOR,
+    "page_down": win32con.VK_NEXT,
+
+    "num_lock": win32con.VK_NUMLOCK,
+    "caps_lock": win32con.VK_CAPITAL,
+    "scroll_lock": win32con.VK_SCROLL,
+
+    "pause": win32con.VK_PAUSE,
+    "print_screen": win32con.VK_SNAPSHOT,
 }
 NO_KEYUP_ACTIONS = [
     win32con.VK_VOLUME_UP,
@@ -56,7 +92,7 @@ def key_down(key_code):
         ctypes.windll.user32.keybd_event(key_code, 0, KEYEVENTF_KEYDOWN, 0)
     except Exception as e:
         logger.error(f"Error key_down {key_code}: {e}")
-    
+
 def key_up(key_code):
     try:
         ctypes.windll.user32.keybd_event(key_code, 0, KEYEVENTF_KEYUP, 0)
@@ -130,7 +166,7 @@ def handle_vk(data):
     if key_code is None:
         logger.warning(f"Invalid command: no 'vk' argument?")
         return
-    
+
     key_code = json.loads(key_code)
     pressure = data.get("pressure", "press") # "press" / "down" / "up"
 
@@ -143,8 +179,8 @@ def handle_vk(data):
         elif pressure == "up":
             key_up(key_code)
         else:
-            press_key(key_code) 
-           
+            press_key(key_code)
+
     else:
         logger.warning(f"Unknown VirtualKey command: {key_code}")
         return
