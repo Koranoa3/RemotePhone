@@ -139,7 +139,20 @@
                     "y": 1
                 },
                 "size": {
-                    "width": 3,
+                    "width": 2,
+                    "height": 1
+                }
+            },
+            {
+                "label": "Task View",
+                "type": "action",
+                "command": ["win", "tab"],
+                "position": {
+                    "x": 3,
+                    "y": 1
+                },
+                "size": {
+                    "width": 1,
                     "height": 1
                 }
             },
@@ -189,9 +202,9 @@
                 }
             },
             {
-                "label": "New Tab",
-                "type": "action",
-                "command": ["ctrl", "t"],
+                "label": "Mid Click",
+                "type": "button",
+                "command": "middle",
                 "position": {
                     "x": 2,
                     "y": 4

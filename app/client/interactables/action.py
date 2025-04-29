@@ -70,6 +70,9 @@ ACTIONS = {
 
     "pause": win32con.VK_PAUSE,
     "print_screen": win32con.VK_SNAPSHOT,
+
+    "browser_back": win32con.VK_BROWSER_BACK,
+    "browser_forward": win32con.VK_BROWSER_FORWARD,
 }
 NO_KEYUP_ACTIONS = [
     win32con.VK_VOLUME_UP,

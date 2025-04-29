@@ -1,6 +1,6 @@
 import asyncio, time, websockets, json
 from app.client.authenticator import on_auth_start, handle_auth_response
-from app.client.interactables import trackpad, action, volume
+from app.client.interactables import trackpad, action, volume, button
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -53,24 +53,27 @@ async def handle_client(websocket):
 
                         elif msg_type == "auth_response":
                             await handle_auth_response(websocket, data["onetime"])
-                    
+
                     elif msg_type == "pong":
                         now = int(time.time() * 1000)
                         rtt = now - data["timestamp"]
                         last_pong = time.time()
                         await websocket.send(json.dumps({"type": "rtt", "rtt": rtt}))
-                    
+
                     elif msg_type.startswith("tp_"):
                         trackpad.handle_event(data["type"], data)
 
                     elif msg_type.startswith("volume_"):
                         volume.handle_event(data["type"], data)
-                        
+
                     elif msg_type == "action":
                         action.handle_action(data)
-                    
+
                     elif msg_type == "vk":
                         action.handle_vk(data)
+
+                    elif msg_type == "button":
+                        button.handle_mousebutton(data)
 
                     elif msg_type == "get_config":
                         with open("client_config.json", "r") as f:
