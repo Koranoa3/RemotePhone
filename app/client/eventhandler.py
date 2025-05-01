@@ -76,7 +76,7 @@ async def handle_client(websocket):
                         button.handle_mousebutton(data)
 
                     elif msg_type == "get_config":
-                        with open("client_config.json", "r") as f:
+                        with open("client_config.json", "r", encoding="utf-8") as f:
                             config_data = json.load(f)
                         await websocket.send(json.dumps({"type": "config", "config": config_data}))
 
