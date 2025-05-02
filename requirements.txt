@@ -6,5 +6,4 @@ pywin32
 pycaw
 pystray
 pillow
-win10toast
-winrt
+plyer

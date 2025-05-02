@@ -55,7 +55,7 @@ async def on_auth_start(ws, uuid: str):
     
     ws.auth = AuthSession(uuid=uuid)
     logger.info(f"認証OTP:{ws.auth.passkey}")
-    notify(f"クライアントから認証要求がありました。\nワンタイムキー:{ws.auth.passkey}", duration=15)
+    notify(f"クライアントから認証要求がありました。\nワンタイムキー:{ws.auth.passkey}", duration=10, title="認証要求")
     await ws.send(json.dumps({"type": "auth_needed", "message": "ホストから発行されたワンタイムキーを入力してください。"}))
 
 async def send_auth_needed(ws, message: str, regenerate: bool = True):
@@ -67,7 +67,7 @@ async def send_auth_needed(ws, message: str, regenerate: bool = True):
         ws.auth.passkey = onetime_passkey(ws.auth.uuid)
         ws.auth.timestamp = int(time.time())
         logger.info(f"認証OTP再発行:{ws.auth.passkey}")
-        notify(f"クライアントから再度認証要求がありました。\nワンタイムキー:{ws.auth.passkey}", duration=15)
+        notify(f"クライアントから再度認証要求がありました。\nワンタイムキー:{ws.auth.passkey}", duration=10, title="認証要求")
 
     await ws.send(json.dumps({
         "type": "auth_needed",
