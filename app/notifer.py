@@ -1,20 +1,14 @@
-from win10toast import ToastNotifier
-import threading
 
-toaster = ToastNotifier()
-toast_lock = threading.Lock()
-toast_timer = None
+from plyer import notification
 
-def notify(message, title="RemotePhone", duration=2):
-    global toast_timer
-
-    def _show():
-        with toast_lock:
-            toaster.show_toast(title, message, duration=duration, icon_path="app.ico", threaded=True)
-
-    with toast_lock:
-        if toast_timer and toast_timer.is_alive():
-            toast_timer.cancel()
-
-        toast_timer = threading.Timer(0.1, _show)
-        toast_timer.start()
+def notify(message, title="RemotePhone", duration=5, app_name="RemotePhone"):
+    try:
+        notification.notify(
+            title=title,
+            message=message,
+            app_name=app_name,
+            timeout=duration,
+            app_icon="app.ico"
+        )
+    except Exception as e:
+        print(f"通知送信エラー: {e}")
