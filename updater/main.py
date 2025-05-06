@@ -70,6 +70,29 @@ def launch_new_app(app_path):
     except Exception as e:
         print(f"[Error] 新アプリ起動失敗: {e}")
 
+def delete_old_app(window):
+    app_dirs = [d for d in os.listdir(".") if os.path.isdir(d) and d.startswith(APP_DIR_PREFIX)]
+    pattern = re.compile(r"app-(v\d+\.\d+\.\d+)")
+    versions = []
+
+    for d in app_dirs:
+        match = pattern.match(d)
+        if match:
+            versions.append((match.group(1), d))
+
+    if versions:
+        versions.sort(
+            key=lambda x: list(map(int, re.match(r"v(\d+)\.(\d+)\.(\d+)", x[0]).groups())),
+            reverse=True
+        )
+
+    for _, dir_name in versions[1:]:  # Skip the latest version
+        try:
+            window.set_status(f"{dir_name} を削除中...")
+            shutil.rmtree(dir_name)
+        except Exception as e:
+            print(f"[Error] 古いバージョン削除失敗: {e}")
+
 # --- 多重起動防止防止 ---
 
 def create_lock():
@@ -116,7 +139,7 @@ def main():
     window.run_in_thread()
 
     window.set_status("アップデートを確認中...")
-    current_version, current_dir = get_current_version()
+    current_version, current_version_dir = get_current_version()
     print(f"現行バージョン: {current_version if current_version else 'なし'}")
 
     latest_version = get_latest_version()
@@ -126,7 +149,7 @@ def main():
 
     print(f"最新バージョン: {latest_version}")
 
-    app_dir = current_dir if current_version else None
+    app_dir = current_version_dir if current_version else None
     if not current_version == latest_version:
         # アップデート処理
         print("アップデートを開始します。")
@@ -139,6 +162,7 @@ def main():
 
             window.set_status("展開中...")
             extract_zip(zip_path, app_dir)
+            shutil.rmtree(TEMP_DIR)
             print("アップデート完了。新しいバージョンを起動します。")
         else:
             print("[Abort] アップデートのダウンロードに失敗")
@@ -146,6 +170,8 @@ def main():
         print("最新バージョンです。")
 
     if app_dir and os.path.exists(app_dir):
+        delete_old_app(window)
+        
         window.set_status("起動中...")
         new_app_path = os.path.join(app_dir, EXE_NAME)
         launch_new_app(new_app_path)
