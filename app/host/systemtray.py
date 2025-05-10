@@ -10,7 +10,7 @@ logger = getLogger(__name__)
 
 root = None  # tkinter root window
 tray_icon = None
-connection_status = "Disconnected"
+connection_status = "Not connected"
 register_with_retry = None  # Set externally
 
 
@@ -21,7 +21,10 @@ def setup_tray():
     root.after(0, root.quit)
 
 
-def update_tray():
+def update_tray(connection_status_text:str=None):
+    global connection_status
+    if connection_status_text:
+        connection_status = connection_status_text
     if tray_icon:
         tray_icon.menu = _generate_menu()
         tray_icon.update_menu()
@@ -29,7 +32,7 @@ def update_tray():
 
 def _generate_menu():
     return pystray.Menu(
-        pystray.MenuItem(f"Server connection status: {connection_status}", None, enabled=False),
+        pystray.MenuItem(f"Server: {connection_status}", None, enabled=False),
         pystray.MenuItem("Reconnect to server", _on_reconnect),
         pystray.MenuItem("Connect with phone", show_qrcode_dialog),
         pystray.MenuItem("Quit", _on_quit)

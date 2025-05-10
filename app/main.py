@@ -35,12 +35,10 @@ def start_websocket_thread(local_ip):
 
 register_lock = threading.Lock()
 def register_with_retry():
-    global tray_status
 
     from app.server.register import register, get_local_ip
 
-    tray_status = "Connecting"
-    update_tray()
+    update_tray("Connecting")
 
     attempts = 1
     while attempts < 10:
@@ -49,8 +47,7 @@ def register_with_retry():
             local_ip = get_local_ip()
             start_heartbeat_thread(SERVER_URL, local_ip)
             start_websocket_thread(local_ip)
-            tray_status = "Connected"
-            update_tray()
+            update_tray("Connected")
             logger.info("Host registered, heartbeat and WebSocket server started.")
             return
         else:
@@ -60,20 +57,18 @@ def register_with_retry():
             time.sleep(retry_after)
             attempts += 1
 
-    tray_status = "Failed"
-    update_tray()
+    update_tray("Disconnected")
     notify("Registration failed. Please reconnect manually from the menu.")
     logger.error("Registration failed.")
 
 
 ### tray icon ###############################
 
-from app.host.systemtray import setup_tray, update_tray, connection_status as tray_status
+from app.host.systemtray import setup_tray, update_tray
 import app.host.systemtray as systemtray  # Assign register_with_retry
 
 # Add after defining register_with_retry
 systemtray.register_with_retry = register_with_retry
-tray_status = "Disconnected"
 
 ### main function ###############################
 
