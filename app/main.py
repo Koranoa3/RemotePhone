@@ -29,9 +29,9 @@ def start_heartbeat_thread(server_url, local_ip):
     heartbeat_thread.start()
 
 def start_websocket_thread(local_ip):
-    from app.client.websocket_server import run_websocket_server, stop_websocket_server, stop_event
+    from app.client.websocket_server import run_websocket_server, stop_websocket_server
     
-    stop_websocket_server()  # 事前に止める
+    stop_websocket_server()  # stop any existing server
     threading.Thread(target=lambda: asyncio.run(run_websocket_server(local_ip)), daemon=True).start()
 
 register_lock = threading.Lock()

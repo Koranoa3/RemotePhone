@@ -35,9 +35,10 @@ async def run_websocket_server(local_ip: str, port: int = 8765):
     logger.info(f"WebSocket server running: ws://{local_ip}:{port}")
     while not stop_event.is_set():
         await asyncio.sleep(0.1)
-    websocket_server.close()
     await websocket_server.wait_closed()
     websocket_server = None
 
 def stop_websocket_server():
     stop_event.set()
+    if websocket_server:
+        websocket_server.close()

@@ -33,15 +33,15 @@ def update_tray(connection_status_text:str=None):
 def _generate_menu():
     return pystray.Menu(
         pystray.MenuItem(f"Server: {connection_status}", None, enabled=False),
-        pystray.MenuItem("Reconnect", _on_reconnect),
         pystray.MenuItem("Connect with phone", show_qrcode_dialog),
+        pystray.MenuItem("Reconnect", _on_reconnect),
         pystray.MenuItem("Quit", _on_quit)
     )
 
 
 def _on_reconnect(icon, item):
     logger.info("Reconnect requested.")
-    notify("Attempting to reconnect to the server.")
+    notify("Attempting to restart the connection.")
 
     threading.Thread(target=_do_reconnect, daemon=True).start()
 
