@@ -7,8 +7,8 @@ logger = getLogger(__name__)
 
 from app.host.notifer import notify
 
-HEARTBEAT_INTERVAL = 3  # 秒
-HEARTBEAT_TIMEOUT = 6  # 秒以内にpongが返らなければ切断
+HEARTBEAT_INTERVAL = 3  # seconds
+HEARTBEAT_TIMEOUT = 6  # disconnect if pong is not received within this time
 
 async def handle_client(websocket):
     last_pong = time.time()
@@ -19,19 +19,19 @@ async def handle_client(websocket):
             if not websocket.authenticated:
                 await asyncio.sleep(HEARTBEAT_INTERVAL)
                 continue
-            timestamp = int(time.time() * 1000) # ミリ秒に変換
+            timestamp = int(time.time() * 1000)  # convert to milliseconds
             ping_msg = json.dumps({"type": "ping", "timestamp": timestamp})
             try:
                 await websocket.send(ping_msg)
                 await asyncio.sleep(HEARTBEAT_INTERVAL)
                 if time.time() - last_pong > HEARTBEAT_TIMEOUT:
-                    logger.warning("pongが返ってこないので切断")
+                    logger.warning("Disconnecting due to missing pong")
                     await websocket.close(code=1001, reason="pong timeout")
                     break
             except websockets.ConnectionClosedOK as e:
                 break
             except:
-                logger.error("ping送信失敗")
+                logger.error("Failed to send ping")
                 break
 
     async def listen():
@@ -42,7 +42,7 @@ async def handle_client(websocket):
                 try:
                     data = json.loads(message)
                 except Exception:
-                    logger.error(f"JSONデコード失敗: {message}")
+                    logger.error(f"Failed to decode JSON: {message}")
                     continue
 
                 try:
@@ -81,19 +81,19 @@ async def handle_client(websocket):
                         await websocket.send(json.dumps({"type": "config", "config": config_data}))
 
                     else:
-                        logger.info(f"タイプ検知外のメッセージ:{data}")
+                        logger.info(f"Message with unrecognized type: {data}")
                 except Exception as e:
-                    logger.error(f"メッセージ処理エラー: {e}")
+                    logger.error(f"Error processing message: {e}")
 
         except websockets.ConnectionClosedOK as e:
             if e.code == 1001:
-                logger.info("切断: クライアントが離脱")
+                logger.info("Disconnected: Client left")
             elif e.code == 4003:
-                logger.info("切断: 認証失敗")
+                logger.info("Disconnected: Authentication failed")
             else:
-                logger.warning(f"切断: 異常終了: {e.code} - {e.reason}")
+                logger.warning(f"Disconnected: Abnormal termination: {e.code} - {e.reason}")
         except websockets.ConnectionClosedError as e:
             if e.code == 1006:
-                logger.warning("切断: 接続状態が消滅")
+                logger.warning("Disconnected: Connection state disappeared")
 
     await asyncio.gather(heartbeat(), listen())

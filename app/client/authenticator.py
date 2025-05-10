@@ -7,7 +7,7 @@ logger = getLogger(__name__)
 from app.host.notifer import notify
 
 registered_uuids_path = "registered_uuids.txt"
-# --- 認証済みUUID ---
+# --- Registered UUID ---
 def if_uuid_registered(uuid: str) -> bool:
     if not os.path.exists(registered_uuids_path):
         open(registered_uuids_path, "w").close()
@@ -22,7 +22,7 @@ def register_uuid(uuid: str) -> bool:
         f.write(uuid + "\n")
     return True
 
-# --- OTP生成 ---
+# --- OTP Generation ---
 def onetime_passkey(uuid: str, timestamp: int = None) -> str:
     if timestamp is None:
         timestamp = int(time.time())
@@ -30,7 +30,7 @@ def onetime_passkey(uuid: str, timestamp: int = None) -> str:
     otp = int(hash_object.hexdigest(), 16) % 10000
     return f"{otp:04d}"
 
-# --- セッション構造体 ---
+# --- Session Structure ---
 @dataclass
 class AuthSession:
     def __init__(self, uuid: str):
@@ -43,31 +43,31 @@ class AuthSession:
         return (int(time.time()) - self.timestamp) > 60
 
 
-# --- 認証処理 ---
+# --- Authentication Process ---
 async def on_auth_start(ws, uuid: str):
-    logger.info(f"認証開始:{uuid}")
+    logger.info(f"Authentication started: {uuid}")
     if if_uuid_registered(uuid):
-        logger.info("認証成功: UUIDは登録済みです。")
-        notify("クライアントが接続されました。")
+        logger.info("Authentication successful: UUID is already registered.")
+        notify("Client has connected.")
         ws.authenticated = True
         await ws.send(json.dumps({"type": "auth_result", "status": "ok"}))
         return
     
     ws.auth = AuthSession(uuid=uuid)
-    logger.info(f"認証OTP:{ws.auth.passkey}")
-    notify(f"クライアントから認証要求がありました。\nワンタイムキー:{ws.auth.passkey}", duration=10, title="認証要求")
-    await ws.send(json.dumps({"type": "auth_needed", "message": "ホストから発行されたワンタイムキーを入力してください。"}))
+    logger.info(f"Authentication OTP: {ws.auth.passkey}")
+    notify(f"Authentication request received from client.\nOne-time key: {ws.auth.passkey}", duration=10, title="Authentication Request")
+    await ws.send(json.dumps({"type": "auth_needed", "message": "Please enter the one-time key issued by the host."}))
 
 async def send_auth_needed(ws, message: str, regenerate: bool = True):
     if not hasattr(ws, "auth"):
-        logger.info("認証セッションがありません。")
+        logger.info("No authentication session found.")
         return
 
     if regenerate:
         ws.auth.passkey = onetime_passkey(ws.auth.uuid)
         ws.auth.timestamp = int(time.time())
-        logger.info(f"認証OTP再発行:{ws.auth.passkey}")
-        notify(f"クライアントから再度認証要求がありました。\nワンタイムキー:{ws.auth.passkey}", duration=10, title="認証要求")
+        logger.info(f"Authentication OTP reissued: {ws.auth.passkey}")
+        notify(f"Authentication request received again from client.\nOne-time key: {ws.auth.passkey}", duration=10, title="Authentication Request")
 
     await ws.send(json.dumps({
         "type": "auth_needed",
@@ -84,21 +84,20 @@ async def handle_auth_response(ws, onetime: str):
 
     if status == "ok":
         ws.authenticated = True
-        logger.info("認証成功")
-        notify("クライアントが接続されました。")
+        logger.info("Authentication successful")
+        notify("Client has connected.")
         if register_uuid(ws.auth.uuid):
-            logger.info("UUIDを登録しました。")
+            logger.info("UUID registered successfully.")
         else:
-            logger.error("UUIDの登録に失敗しました。")
+            logger.error("Failed to register UUID.")
         return True
 
-    logger.info(f"認証失敗: uuid:{ws.auth.uuid}, reason:{reason}")
+    logger.info(f"Authentication failed: uuid: {ws.auth.uuid}, reason: {reason}")
     if not result.get("allow_retry", False):
         await ws.close(code=4003)
         return False
 
-    
-    await send_auth_needed(ws, f"{reason}。再度入力してください。", regenerate=True)
+    await send_auth_needed(ws, f"{reason}. Please try again.", regenerate=True)
     return False
 
 def check_response(ws, onetime: str) -> dict:
@@ -108,14 +107,14 @@ def check_response(ws, onetime: str) -> dict:
         return {
             "type": "auth_result",
             "status": "fail",
-            "reason": "セッションがありません",
+            "reason": "No session found",
             "allow_retry": False
         }
     if session.is_expired():
         return {
             "type": "auth_result",
             "status": "fail",
-            "reason": "パスキーの有効期限が切れています",
+            "reason": "Passkey has expired",
             "allow_retry": True
         }
     if onetime != session.passkey:
@@ -123,7 +122,7 @@ def check_response(ws, onetime: str) -> dict:
             return {
                 "type": "auth_result",
                 "status": "fail",
-                "reason": "試行回数が上限に達しました",
+                "reason": "Maximum number of attempts reached",
                 "allow_retry": False
             }
         else:
@@ -131,7 +130,7 @@ def check_response(ws, onetime: str) -> dict:
             return {
                 "type": "auth_result",
                 "status": "fail",
-                "reason": "パスキーが違います",
+                "reason": "Incorrect passkey",
                 "allow_retry": True
             }
     return {

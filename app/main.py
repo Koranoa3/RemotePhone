@@ -11,7 +11,7 @@ with open(resource_path("app/resources/log_config.json"), "r", encoding="utf-8")
     log_conf = json.load(f)
 config.dictConfig(log_conf)
 logger = getLogger(__name__)
-logger.info("初期化中...")
+logger.info("Initializing...")
 
 from app.host.notifer import notify
 
@@ -22,7 +22,7 @@ def start_heartbeat_thread(server_url, local_ip):
     global heartbeat_thread
 
     if heartbeat_thread and heartbeat_thread.is_alive():
-        logger.info("ハートビートスレッドは既に起動中です。")
+        logger.info("Heartbeat thread is already running.")
         return
 
     from app.server.heartbeat import start_heartbeat
@@ -39,7 +39,7 @@ def register_with_retry():
 
     from app.server.register import register, get_local_ip
 
-    tray_status = "接続中"
+    tray_status = "Connecting"
     update_tray()
 
     attempts = 1
@@ -49,59 +49,59 @@ def register_with_retry():
             local_ip = get_local_ip()
             start_heartbeat_thread(SERVER_URL, local_ip)
             start_websocket_thread(local_ip)
-            tray_status = "接続済み"
+            tray_status = "Connected"
             update_tray()
-            logger.info("ホストは登録され、ハートビートとWebSocketサーバーを開始しました。")
+            logger.info("Host registered, heartbeat and WebSocket server started.")
             return
         else:
             retry_after = attempts ** 2 + 5
-            notify(f"登録に失敗しました。{retry_after}秒後に再試行します。")
-            logger.info(f"登録に失敗しました。{retry_after}秒後に再試行します。")
+            notify(f"Registration failed. Retrying in {retry_after} seconds.")
+            logger.info(f"Registration failed. Retrying in {retry_after} seconds.")
             time.sleep(retry_after)
             attempts += 1
 
-    tray_status = "失敗"
+    tray_status = "Failed"
     update_tray()
-    notify("登録に失敗しました。メニューから手動で再接続してください。")
-    logger.error("登録に失敗しました。")
+    notify("Registration failed. Please reconnect manually from the menu.")
+    logger.error("Registration failed.")
 
 
 ### tray icon ###############################
 
 from app.host.systemtray import setup_tray, update_tray, connection_status as tray_status
-import app.host.systemtray as systemtray  # register_with_retry を代入するため
+import app.host.systemtray as systemtray  # Assign register_with_retry
 
-# register_with_retry の定義後に追加
+# Add after defining register_with_retry
 systemtray.register_with_retry = register_with_retry
-tray_status = "未接続"
+tray_status = "Disconnected"
 
 ### main function ###############################
 
 SERVER_URL = "http://skyboxx.tplinkdns.com:8000"
 
 def main():
-    logger.info("アプリケーションが起動しました。")
+    logger.info("Application started.")
 
-    # サーバーURLの取得
+    # Get server URL
     if len(sys.argv) > 1:
         global SERVER_URL
         SERVER_URL = sys.argv[1]
-        logger.info(f"コマンドライン引数からサーバーURLを設定しました: {SERVER_URL}")
+        logger.info(f"Server URL set from command-line argument: {SERVER_URL}")
     else:
-        logger.info(f"デフォルトのサーバーURLを使用します: {SERVER_URL}")
+        logger.info(f"Using default server URL: {SERVER_URL}")
 
-    # 非表示Tkウィンドウ（1回だけ必要）
+    # Hidden Tk window (needed only once)
     root = tk.Tk()
     root.withdraw()
     systemtray.root = root
 
-    # 接続スレッド開始
+    # Start connection thread
     register_thread = threading.Thread(target=register_with_retry, daemon=True)
     register_thread.start()
 
     threading.Thread(target=setup_tray, daemon=True).start()
     root.mainloop()
-    logger.info("アプリケーションが終了しました。")
+    logger.info("Application exited.")
     
 if __name__ == "__main__":
     main()

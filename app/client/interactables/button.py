@@ -5,7 +5,7 @@ import json
 from logging import getLogger
 logger = getLogger(__name__)
 
-# 拡張ボタンのコード
+# Mouse button constants
 XBUTTON1 = 0x0001
 XBUTTON2 = 0x0002
 

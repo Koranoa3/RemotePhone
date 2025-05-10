@@ -8,10 +8,10 @@ from app.host.connect_dialog import show_qrcode_dialog
 
 logger = getLogger(__name__)
 
-root = None  # tkinterのルートウィンドウ
+root = None  # tkinter root window
 tray_icon = None
-connection_status = "未接続"
-register_with_retry = None  # 外部からセットされる
+connection_status = "Disconnected"
+register_with_retry = None  # Set externally
 
 
 def setup_tray():
@@ -29,16 +29,16 @@ def update_tray():
 
 def _generate_menu():
     return pystray.Menu(
-        pystray.MenuItem(f"サーバー接続状態：{connection_status}", None, enabled=False),
-        pystray.MenuItem("サーバーに再接続", _on_reconnect),
-        pystray.MenuItem("スマホで接続", show_qrcode_dialog),
-        pystray.MenuItem("終了", _on_quit)
+        pystray.MenuItem(f"Server connection status: {connection_status}", None, enabled=False),
+        pystray.MenuItem("Reconnect to server", _on_reconnect),
+        pystray.MenuItem("Connect with phone", show_qrcode_dialog),
+        pystray.MenuItem("Quit", _on_quit)
     )
 
 
 def _on_reconnect(icon, item):
-    logger.info("再接続がリクエストされました。")
-    notify("サーバーへの再接続を試みます。")
+    logger.info("Reconnect requested.")
+    notify("Attempting to reconnect to the server.")
 
     threading.Thread(target=_do_reconnect, daemon=True).start()
 
@@ -50,5 +50,5 @@ def _do_reconnect():
 
 
 def _on_quit(icon, item):
-    logger.info("終了処理が呼ばれました。")
+    logger.info("Quit process called.")
     icon.stop()

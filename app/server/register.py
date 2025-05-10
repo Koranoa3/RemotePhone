@@ -26,7 +26,7 @@ def register(server_url: str, port: int = 8765) -> bool:
         local_ip=get_local_ip(),
         port=port
     )
-    logger.info(f"ホスト情報をサーバーに登録します: local_ip={host_info.local_ip}, port={host_info.port}")
+    logger.info(f"Registering host information to the server: local_ip={host_info.local_ip}, port={host_info.port}")
     try:
         res = requests.post(f"{server_url}/api/register", json={
             "name": host_info.name,
@@ -34,11 +34,11 @@ def register(server_url: str, port: int = 8765) -> bool:
             "port": host_info.port
         })
         res.raise_for_status()
-        logger.info(f"ホスト情報登録: グローバルIP:{res.json().get("from_ip", "不明")}")
+        logger.info(f"Host information registered: Global IP:{res.json().get('from_ip', 'Unknown')}")
         return True
     except requests.exceptions.RequestException as e:
-        logger.error(f"ホスト情報登録失敗: {type(e.__cause__)}")
+        logger.error(f"Failed to register host information: {type(e.__cause__)}")
         return False
     except Exception as e:
-        logger.error("ホスト情報登録失敗:", e)
+        logger.error("Failed to register host information:", e)
         return False
