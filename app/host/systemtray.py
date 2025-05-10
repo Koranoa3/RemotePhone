@@ -33,7 +33,7 @@ def update_tray(connection_status_text:str=None):
 def _generate_menu():
     return pystray.Menu(
         pystray.MenuItem(f"Server: {connection_status}", None, enabled=False),
-        pystray.MenuItem("Reconnect to server", _on_reconnect),
+        pystray.MenuItem("Reconnect", _on_reconnect),
         pystray.MenuItem("Connect with phone", show_qrcode_dialog),
         pystray.MenuItem("Quit", _on_quit)
     )
