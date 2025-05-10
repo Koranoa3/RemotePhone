@@ -1,7 +1,7 @@
 import websockets
 from app.client.eventhandler import handle_client
 
-from app.notifer import notify
+from app.host.notifer import notify
 
 from logging import getLogger
 import asyncio

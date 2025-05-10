@@ -13,7 +13,7 @@ config.dictConfig(log_conf)
 logger = getLogger(__name__)
 logger.info("初期化中...")
 
-from app.notifer import notify
+from app.host.notifer import notify
 
 ### core process thread ###############################
 
@@ -80,6 +80,7 @@ def setup_tray():
         return pystray.Menu(
             pystray.MenuItem(f"接続状態：{connection_status}", lambda icon, item: None, enabled=False),
             pystray.MenuItem("サーバーに再接続", on_reconnect),
+            pystray.MenuItem("スマホで接続", lambda icon, item: notify("スマホで接続するには、QRコードをスキャンしてください。")),
             pystray.MenuItem("終了", on_quit)
         )
 

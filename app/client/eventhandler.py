@@ -5,7 +5,7 @@ from app.client.interactables import trackpad, action, volume, button
 from logging import getLogger
 logger = getLogger(__name__)
 
-from app.notifer import notify
+from app.host.notifer import notify
 
 HEARTBEAT_INTERVAL = 3  # 秒
 HEARTBEAT_TIMEOUT = 6  # 秒以内にpongが返らなければ切断
