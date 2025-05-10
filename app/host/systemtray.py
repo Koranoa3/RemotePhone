@@ -4,9 +4,11 @@ from logging import getLogger
 import pystray
 from PIL import Image
 from app.host.notifer import notify
+from app.host.connect_dialog import show_qrcode_dialog
 
 logger = getLogger(__name__)
 
+root = None  # tkinterのルートウィンドウ
 tray_icon = None
 connection_status = "未接続"
 register_with_retry = None  # 外部からセットされる
@@ -15,7 +17,8 @@ register_with_retry = None  # 外部からセットされる
 def setup_tray():
     global tray_icon
     tray_icon = pystray.Icon("RemotePhone", Image.open("app.ico"), menu=_generate_menu())
-    return tray_icon
+    tray_icon.run()
+    root.after(0, root.quit)
 
 
 def update_tray():
@@ -28,7 +31,7 @@ def _generate_menu():
     return pystray.Menu(
         pystray.MenuItem(f"サーバー接続状態：{connection_status}", None, enabled=False),
         pystray.MenuItem("サーバーに再接続", _on_reconnect),
-        pystray.MenuItem("スマホで接続", lambda icon, item: notify("スマホで接続するには、QRコードをスキャンしてください。")),
+        pystray.MenuItem("スマホで接続", show_qrcode_dialog),
         pystray.MenuItem("終了", _on_quit)
     )
 

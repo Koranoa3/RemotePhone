@@ -1,4 +1,4 @@
-import threading, asyncio
+import threading, asyncio, tkinter as tk
 import time, json, sys, os
 
 ### logging ###############################
@@ -68,7 +68,7 @@ def register_with_retry():
 
 ### tray icon ###############################
 
-from app.host.systemtray import setup_tray, update_tray, tray_icon, connection_status as tray_status
+from app.host.systemtray import setup_tray, update_tray, connection_status as tray_status
 import app.host.systemtray as systemtray  # register_with_retry を代入するため
 
 # register_with_retry の定義後に追加
@@ -82,7 +82,7 @@ SERVER_URL = "http://skyboxx.tplinkdns.com:8000"
 def main():
     logger.info("アプリケーションが起動しました。")
 
-    # コマンドライン引数からserverurlを取得
+    # サーバーURLの取得
     if len(sys.argv) > 1:
         global SERVER_URL
         SERVER_URL = sys.argv[1]
@@ -90,15 +90,18 @@ def main():
     else:
         logger.info(f"デフォルトのサーバーURLを使用します: {SERVER_URL}")
 
-    # まずトレイアイコンを即セットアップ
-    icon = setup_tray()
+    # 非表示Tkウィンドウ（1回だけ必要）
+    root = tk.Tk()
+    root.withdraw()
+    systemtray.root = root
 
-    # 接続処理を別スレッドで開始
+    # 接続スレッド開始
     register_thread = threading.Thread(target=register_with_retry, daemon=True)
     register_thread.start()
 
-    # トレイアイコンを動かす
-    icon.run()
-
+    threading.Thread(target=setup_tray, daemon=True).start()
+    root.mainloop()
+    logger.info("アプリケーションが終了しました。")
+    
 if __name__ == "__main__":
     main()
