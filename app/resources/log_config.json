@@ -18,10 +18,11 @@
       },
       "fileHandler": {
         "class": "logging.FileHandler",
-        "level": "DEBUG",
+        "level": "INFO",
         "formatter": "simple",
         "filename": "application.log",
-        "encoding": "utf-8"
+        "encoding": "utf-8",
+        "mode": "w"
       }
     },
   
