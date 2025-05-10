@@ -10,7 +10,7 @@ class UpdaterWindow:
         self.root.resizable(False, False)
         self.root.attributes('-topmost', True)
 
-        self.label = tk.Label(self.root, text="初期化中...", font=("Arial", 16))
+        self.label = tk.Label(self.root, text="Initializing...", font=("Arial", 16))
         self.label.pack(expand=True)
 
     def set_status(self, text):

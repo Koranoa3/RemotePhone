@@ -11,10 +11,10 @@ def download_update(zip_path, window):
                 f.write(res.content)
             return True
         except Exception as e:
-            print(f"[Retry {attempt}] ダウンロード失敗: {e}")
+            print(f"[Retry {attempt}] Download failed: {e}")
             wait_time = min(2 ** attempt, 60)
             for remaining in range(wait_time, 0, -1):
-                window.set_status(f"ダウンロード失敗。{remaining}秒後に再試行します...")
+                window.set_status(f"Download failed. Retrying in {remaining} seconds...")
                 time.sleep(1)
     return False
 

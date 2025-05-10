@@ -32,63 +32,60 @@ def get_latest_version():
         res.raise_for_status()
         return res.json().get("version")
     except Exception as e:
-        print(f"[Error] 最新バージョン取得失敗: {e}")
+        print(f"[Error] Failed to fetch the latest version: {e}")
         return None
     
 def main():
     if not is_windows():
-        messagebox.showerror("エラー", "このアプリケーションはWindows専用です。")
+        messagebox.showerror("Error", "This application is for Windows only.")
         sys.exit(1)
 
     if is_process_running(EXE_NAME):
-        messagebox.showerror("エラー", f"すでに{EXE_NAME}が実行中です。")
+        messagebox.showerror("Error", f"{EXE_NAME} is already running.")
         sys.exit(1)
 
     create_lock()
 
-    if os.path.exists(TEMP_DIR):
-        shutil.rmtree(TEMP_DIR)
-    os.makedirs(TEMP_DIR, exist_ok=True)
-
     window = UpdaterWindow()
     window.run_in_thread()
-    window.set_status("アップデートを確認中...")
+    window.set_status("Checking for updates...")
 
     current_version, current_version_dir = get_current_version()
-    print(f"現行バージョン: {current_version if current_version else 'なし'}")
+    print(f"Current version: {current_version if current_version else 'None'}")
 
     latest_version = get_latest_version()
     if not latest_version:
-        print("[Abort] 最新バージョン取得に失敗")
+        print("[Abort] Failed to fetch the latest version")
         return
 
-    print(f"最新バージョン: {latest_version}")
+    print(f"Latest version: {latest_version}")
 
     app_dir = current_version_dir if current_version else None
     if not current_version == latest_version:
-        print("アップデートを開始します。")
-        window.set_status("アップデートをダウンロード中...")
+        print("Starting the update process.")
+        window.set_status("Downloading update...")
+        os.makedirs(TEMP_DIR, exist_ok=True)
         zip_path = os.path.join(TEMP_DIR, "update.zip")
         if download_update(zip_path, window):
             app_dir = f"{APP_DIR_PREFIX}{latest_version}"
             if os.path.exists(app_dir):
                 shutil.rmtree(app_dir)
 
-            window.set_status("展開中...")
+            window.set_status("Extracting...")
             extract_zip(zip_path, app_dir)
             shutil.rmtree(TEMP_DIR)
-            print("アップデート完了。新しいバージョンを起動します。")
+            print("Update complete. Launching the new version.")
         else:
-            print("[Abort] アップデートのダウンロードに失敗")
+            print("[Abort] Failed to download the update")
 
     if app_dir and os.path.exists(app_dir):
         delete_old_app(window)
-        window.set_status("起動中...")
+        window.set_status("Launching...")
         new_app_path = os.path.join(app_dir, EXE_NAME)
         launch_new_app(new_app_path)
     else:
-        print("アプリケーションが見つかりません。")
-        window.set_status("アプリケーションが見つかりません。")
+        print("Application not found.")
+        window.set_status("Application not found.")
 
     window.close()
 

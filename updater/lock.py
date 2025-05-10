@@ -5,7 +5,7 @@ from config import LOCK_FILE
 
 def create_lock():
     if os.path.exists(LOCK_FILE):
-        print("すでに起動しています。終了します。")
+        print("The application is already running. Exiting.")
         sys.exit(1)
     with open(LOCK_FILE, 'w') as f:
         f.write(str(os.getpid()))
