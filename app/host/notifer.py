@@ -7,8 +7,7 @@ def notify(message, title="RemotePhone", duration=5, app_name="RemotePhone"):
             title=title,
             message=message,
             app_name=app_name,
-            timeout=duration,
-            app_icon="app.ico"
+            timeout=duration
         )
     except Exception as e:
         print(f"通知送信エラー: {e}")

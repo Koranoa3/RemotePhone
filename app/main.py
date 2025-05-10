@@ -35,11 +35,11 @@ def start_websocket_thread(local_ip):
 
 register_lock = threading.Lock()
 def register_with_retry():
-    global connection_status
+    global tray_status
 
     from app.server.register import register, get_local_ip
 
-    connection_status = "接続中"
+    tray_status = "接続中"
     update_tray()
 
     attempts = 1
@@ -49,7 +49,7 @@ def register_with_retry():
             local_ip = get_local_ip()
             start_heartbeat_thread(SERVER_URL, local_ip)
             start_websocket_thread(local_ip)
-            connection_status = "接続済み"
+            tray_status = "接続済み"
             update_tray()
             logger.info("ホストは登録され、ハートビートとWebSocketサーバーを開始しました。")
             return
@@ -60,7 +60,7 @@ def register_with_retry():
             time.sleep(retry_after)
             attempts += 1
 
-    connection_status = "失敗"
+    tray_status = "失敗"
     update_tray()
     notify("登録に失敗しました。メニューから手動で再接続してください。")
     logger.error("登録に失敗しました。")
@@ -68,52 +68,12 @@ def register_with_retry():
 
 ### tray icon ###############################
 
-connection_status = "未接続"
-tray_icon = None  # Iconインスタンスを外から参照できるようにする
+from app.host.systemtray import setup_tray, update_tray, tray_icon, connection_status as tray_status
+import app.host.systemtray as systemtray  # register_with_retry を代入するため
 
-import pystray
-from PIL import Image
-def setup_tray():
-    global tray_icon
-
-    def generate_menu():
-        return pystray.Menu(
-            pystray.MenuItem(f"接続状態：{connection_status}", lambda icon, item: None, enabled=False),
-            pystray.MenuItem("サーバーに再接続", on_reconnect),
-            pystray.MenuItem("スマホで接続", lambda icon, item: notify("スマホで接続するには、QRコードをスキャンしてください。")),
-            pystray.MenuItem("終了", on_quit)
-        )
-
-    icon = pystray.Icon(
-        "RemotePhone",
-        Image.open("app.ico"),
-        menu=generate_menu()
-    )
-    tray_icon = icon
-    return icon
-
-def update_tray():
-    if tray_icon:
-        tray_icon.menu = pystray.Menu(
-            pystray.MenuItem(f"接続状態：{connection_status}", lambda icon, item: None, enabled=False),
-            pystray.MenuItem("サーバーに再接続", on_reconnect),
-            pystray.MenuItem("終了", on_quit)
-        )
-        tray_icon.update_menu()
-
-def on_reconnect(icon, item):
-    logger.info("再接続がリクエストされました。")
-    notify("サーバーへの再接続を試みます。")
-
-    def reconnect():
-        with register_lock:
-            register_with_retry()
-
-    threading.Thread(target=reconnect, daemon=True).start()
-
-def on_quit(icon, item):
-    logger.info("終了処理が呼ばれました。")
-    icon.stop()
+# register_with_retry の定義後に追加
+systemtray.register_with_retry = register_with_retry
+tray_status = "未接続"
 
 ### main function ###############################
 
