@@ -1,12 +1,11 @@
 import threading, asyncio, tkinter as tk
-import time, json, sys, os
+import time, json, sys
+
 
 ### logging ###############################
 
 from logging import getLogger, config
-def resource_path(relative_path):
-    base_path = getattr(sys, '_MEIPASS', os.path.abspath("."))
-    return os.path.join(base_path, relative_path)
+from app.common import resource_path
 with open(resource_path("app/resources/log_config.json"), "r", encoding="utf-8") as f:
     log_conf = json.load(f)
 config.dictConfig(log_conf)

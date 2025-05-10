@@ -1,8 +1,9 @@
 import tkinter as tk
-import time
+import os, sys
 
 from logging import getLogger
 logger = getLogger(__name__)
+from app.common import resource_path
 
 def show_qrcode_dialog():
     try:
@@ -20,7 +21,7 @@ def show_qrcode_dialog():
         right_frame = tk.Frame(qr_window)
         right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        qr_image = tk.PhotoImage(file="app/resources/hostsqr.png")
+        qr_image = tk.PhotoImage(file=resource_path("app/resources/hostsqr.png"))
         qr_label = tk.Label(left_frame, image=qr_image)
         qr_label.image = qr_image
         qr_label.pack()
