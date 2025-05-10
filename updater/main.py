@@ -5,7 +5,7 @@ import psutil
 from config import TEMP_DIR, APP_DIR_PREFIX, EXE_NAME
 from ui import UpdaterWindow
 from version import get_current_version
-from downloader import download_update, extract_zip, self_update
+from downloader import download_update, extract_zip
 from cleaner import delete_old_app
 from launcher import launch_new_app
 from lock import create_lock
