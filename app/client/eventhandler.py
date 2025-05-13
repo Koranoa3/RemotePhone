@@ -47,6 +47,7 @@ async def handle_client(websocket):
 
                 try:
                     msg_type = data.get("type", None)
+                    msg_sender = data.get("sender", None)
                     if not websocket.authenticated:
                         if msg_type == "auth_start":
                             await on_auth_start(websocket, data["uuid"])
@@ -64,16 +65,20 @@ async def handle_client(websocket):
                         trackpad.handle_event(data["type"], data)
 
                     elif msg_type.startswith("volume_"):
-                        volume.handle_event(data["type"], data)
+                        response = volume.handle_event(data["type"], data)
+                        await respond(websocket, msg_sender, response)
 
                     elif msg_type == "action":
-                        action.handle_action(data)
+                        response = action.handle_action(data)
+                        await respond(websocket, msg_sender, response)
 
                     elif msg_type == "vk":
-                        action.handle_vk(data)
+                        response = action.handle_vk(data)
+                        await respond(websocket, msg_sender, response)
 
                     elif msg_type == "button":
-                        button.handle_mousebutton(data)
+                        response = button.handle_mousebutton(data)
+                        await respond(websocket, msg_sender, response)
 
                     elif msg_type == "get_config":
                         with open("client_config.json", "r", encoding="utf-8") as f:
@@ -97,3 +102,7 @@ async def handle_client(websocket):
                 logger.warning("Disconnected: Connection state disappeared")
 
     await asyncio.gather(heartbeat(), listen())
+
+async def respond(ws, sender, response):
+    if response and sender:
+        await ws.send(json.dumps({"type": "response", "target": sender, "response": response}))
