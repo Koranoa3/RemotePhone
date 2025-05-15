@@ -56,13 +56,29 @@ ACTIONS = {
     "f10": win32con.VK_F10,
     "f11": win32con.VK_F11,
     "f12": win32con.VK_F12,
+    "f13": win32con.VK_F13,
+    "f14": win32con.VK_F14,
+    "f15": win32con.VK_F15,
+    "f16": win32con.VK_F16,
+    "f17": win32con.VK_F17,
+    "f18": win32con.VK_F18,
+    "f19": win32con.VK_F19,
+    "f20": win32con.VK_F20,
+    "f21": win32con.VK_F21,
+    "f22": win32con.VK_F22,
+    "f23": win32con.VK_F23,
+    "f24": win32con.VK_F24,
 
     "insert": win32con.VK_INSERT,
     "delete": win32con.VK_DELETE,
     "home": win32con.VK_HOME,
     "end": win32con.VK_END,
     "page_up": win32con.VK_PRIOR,
+    "pageup": win32con.VK_PRIOR, #alternative
+    "pg_up": win32con.VK_PRIOR, #alternative
     "page_down": win32con.VK_NEXT,
+    "pagedown": win32con.VK_NEXT, #alternative
+    "pg_down": win32con.VK_NEXT, #alternative
 
     "num_lock": win32con.VK_NUMLOCK,
     "caps_lock": win32con.VK_CAPITAL,
