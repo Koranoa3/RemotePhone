@@ -8,3 +8,4 @@ pystray
 pillow
 plyer
 psutil
+pywebview
