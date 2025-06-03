@@ -7,347 +7,457 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="app-container">
-        <div class="sidebar">
-            <div class="app-header">
-                <div class="app-title">RemotePhone</div>
-                <div class="app-subtitle">アプリケーション設定</div>
-            </div>
-            <nav class="nav-menu">
-                <button class="nav-item active" data-section="home">ホーム</button>
-                <button class="nav-item" data-section="auth">認証</button>
-                <button class="nav-item" data-section="customize">カスタマイズ</button>
-                <button class="nav-item" data-section="settings">設定</button>
-                <button class="nav-item" data-section="release">リリースノート</button>
-                <button class="nav-item" data-section="account">アカウント</button>
-            </nav>
+<div class="app-container">
+    <div class="sidebar">
+        <div class="app-header">
+            <div class="app-title">RemotePhone</div>
+            <div class="app-subtitle">設定</div>
         </div>
-
-        <main class="main-content">
-            <!-- ホーム -->
-            <section class="content-section active" id="home">
-                <h1 class="section-title">ダッシュボード</h1>
-                <p class="section-subtitle">アプリケーションの現在の状態と統計情報</p>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value">稼働中</div>
-                        <div class="stat-label">
-                            <span class="status-indicator status-active"></span>
-                            サービス状態
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">24時間</div>
-                        <div class="stat-label">連続稼働時間</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">1,234</div>
-                        <div class="stat-label">処理済みタスク</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">15MB</div>
-                        <div class="stat-label">メモリ使用量</div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3 class="card-title">クイックアクション</h3>
-                    <button class="btn btn-primary" style="margin-right: 10px;">サービス再起動</button>
-                    <button class="btn btn-secondary">ログを表示</button>
-                </div>
-            </section>
-
-            <!-- 認証 -->
-            <section class="content-section" id="auth">
-                <h1 class="section-title">認証設定</h1>
-                <p class="section-subtitle">アプリケーションのセキュリティと認証方法を管理</p>
-
-                <div class="card">
-                    <h3 class="card-title">ログイン設定</h3>
-                    <div class="form-group">
-                        <label class="form-label">認証方法</label>
-                        <select class="form-select">
-                            <option>パスワード認証</option>
-                            <option>二要素認証</option>
-                            <option>生体認証</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">セッション有効期限</label>
-                        <select class="form-select">
-                            <option>1時間</option>
-                            <option>24時間</option>
-                            <option>1週間</option>
-                            <option>無期限</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3 class="card-title">セキュリティオプション</h3>
-                    <div class="form-group">
-                        <label class="form-label">
-                            自動ロック
-                            <label class="toggle-switch">
-                                <input type="checkbox" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">
-                            ログイン通知
-                            <label class="toggle-switch">
-                                <input type="checkbox">
-                                <span class="slider"></span>
-                            </label>
-                        </label>
-                    </div>
-                </div>
-            </section>
-
-            <!-- カスタマイズ -->
-            <section class="content-section" id="customize">
-                <h1 class="section-title">カスタマイズ</h1>
-                <p class="section-subtitle">アプリケーションの外観と動作をカスタマイズ</p>
-
-                <div class="card">
-                    <h3 class="card-title">外観設定</h3>
-                    <div class="form-group">
-                        <label class="form-label">テーマ</label>
-                        <select class="form-select">
-                            <option>ダーク（現在）</option>
-                            <option>ライト</option>
-                            <option>システム設定に従う</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">アクセントカラー</label>
-                        <select class="form-select">
-                            <option>オレンジ（現在）</option>
-                            <option>ブルー</option>
-                            <option>グリーン</option>
-                            <option>パープル</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3 class="card-title">動作設定</h3>
-                    <div class="form-group">
-                        <label class="form-label">
-                            システム起動時に自動開始
-                            <label class="toggle-switch">
-                                <input type="checkbox" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">
-                            最小化時にシステムトレイに格納
-                            <label class="toggle-switch">
-                                <input type="checkbox" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </label>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 設定 -->
-            <section class="content-section" id="settings">
-                <h1 class="section-title">一般設定</h1>
-                <p class="section-subtitle">アプリケーションの基本設定を管理</p>
-
-                <div class="card">
-                    <h3 class="card-title">言語・地域</h3>
-                    <div class="form-group">
-                        <label class="form-label">表示言語</label>
-                        <select class="form-select">
-                            <option>日本語</option>
-                            <option>English</option>
-                            <option>中文</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">タイムゾーン</label>
-                        <select class="form-select">
-                            <option>Asia/Tokyo</option>
-                            <option>UTC</option>
-                            <option>America/New_York</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3 class="card-title">通知設定</h3>
-                    <div class="form-group">
-                        <label class="form-label">
-                            デスクトップ通知
-                            <label class="toggle-switch">
-                                <input type="checkbox" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">
-                            音声通知
-                            <label class="toggle-switch">
-                                <input type="checkbox">
-                                <span class="slider"></span>
-                            </label>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3 class="card-title">データ管理</h3>
-                    <button class="btn btn-secondary" style="margin-right: 10px;">設定をエクスポート</button>
-                    <button class="btn btn-secondary" style="margin-right: 10px;">設定をインポート</button>
-                    <button class="btn btn-primary">設定をリセット</button>
-                </div>
-            </section>
-
-            <!-- リリースノート -->
-            <section class="content-section" id="release">
-                <h1 class="section-title">リリースノート</h1>
-                <p class="section-subtitle">アプリケーションの更新履歴と新機能</p>
-
-                <div class="card">
-                    <div class="version-info">
-                        <div>
-                            <div class="version-number">v2.1.0</div>
-                            <div>新機能: 自動バックアップ機能を追加</div>
-                        </div>
-                        <div class="version-date">2024-01-15</div>
-                    </div>
-                    <div class="version-info">
-                        <div>
-                            <div class="version-number">v2.0.5</div>
-                            <div>修正: メモリリークの問題を解決</div>
-                        </div>
-                        <div class="version-date">2024-01-10</div>
-                    </div>
-                    <div class="version-info">
-                        <div>
-                            <div class="version-number">v2.0.4</div>
-                            <div>改善: パフォーマンスの最適化</div>
-                        </div>
-                        <div class="version-date">2024-01-05</div>
-                    </div>
-                    <div class="version-info">
-                        <div>
-                            <div class="version-number">v2.0.3</div>
-                            <div>修正: 設定画面の表示不具合を修正</div>
-                        </div>
-                        <div class="version-date">2023-12-28</div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3 class="card-title">更新設定</h3>
-                    <div class="form-group">
-                        <label class="form-label">
-                            自動更新
-                            <label class="toggle-switch">
-                                <input type="checkbox" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </label>
-                    </div>
-                    <button class="btn btn-primary">更新を確認</button>
-                </div>
-            </section>
-
-            <!-- アカウント -->
-            <section class="content-section" id="account">
-                <h1 class="section-title">アカウント管理</h1>
-                <p class="section-subtitle">ユーザーアカウントとプロフィール設定</p>
-
-                <div class="card">
-                    <h3 class="card-title">プロフィール情報</h3>
-                    <div class="form-group">
-                        <label class="form-label">ユーザー名</label>
-                        <input type="text" class="form-input" value="user@example.com">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">表示名</label>
-                        <input type="text" class="form-input" value="ユーザー">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">メールアドレス</label>
-                        <input type="email" class="form-input" value="user@example.com">
-                    </div>
-                    <button class="btn btn-primary">プロフィールを更新</button>
-                </div>
-
-                <div class="card">
-                    <h3 class="card-title">パスワード変更</h3>
-                    <div class="form-group">
-                        <label class="form-label">現在のパスワード</label>
-                        <input type="password" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">新しいパスワード</label>
-                        <input type="password" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">パスワード確認</label>
-                        <input type="password" class="form-input">
-                    </div>
-                    <button class="btn btn-primary">パスワードを変更</button>
-                </div>
-
-                <div class="card">
-                    <h3 class="card-title">アカウント操作</h3>
-                    <button class="btn btn-secondary" style="margin-right: 10px;">データをエクスポート</button>
-                    <button class="btn btn-primary">アカウントを削除</button>
-                </div>
-            </section>
-        </main>
+        <nav class="nav-menu">
+            <button class="nav-item active" data-section="home">🏠 ホーム</button>
+            <button class="nav-item" data-section="connect">📲 デバイスを接続する</button>
+            <button class="nav-item" data-section="customize">🛠️ カスタマイズ</button>
+            <button class="nav-item" data-section="settings">⚙️ 設定</button>
+            <button class="nav-item" data-section="release">📝 リリースノート</button>
+        </nav>
     </div>
+
+    <main class="main-content">
+        <!-- ホーム -->
+        <section class="content-section active" id="home">
+            <h1 class="section-title">🏠 ホーム</h1>
+            
+            <div class="home-grid">
+                <!-- デバイス接続状態 -->
+                <div class="card main-device-status">
+                    <h3 class="card-title">デバイス接続状態</h3>
+                    <div id="device-connection-status">
+                        <!-- 未接続状態 -->
+                        <div class="connection-status disconnected" id="disconnected-state">
+                            <div class="status-text inactive">接続されていません</div>
+                            <div class="connect-action">
+                                <button class="btn btn-primary connect-btn" onclick="showConnectSection()">デバイスを接続する</button>
+                            </div>
+                        </div>
+                        
+                        <!-- 接続中状態 -->
+                        <div class="connection-status connected" id="connected-state" style="display: none;">
+                            <div class="status-text active">接続中</div>
+                            <div class="device-info">
+                                <div class="device-name">iPhone 15 Pro</div>
+                                <div class="rtt-status">
+                                    <span class="rtt-label">RTT:</span>
+                                    <span class="rtt-value stable">安定</span>
+                                </div>
+                                <div class="connection-time">接続時間: 00:15:32</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- サーバー接続状況 -->
+                <div class="card server-status">
+                    <h3 class="card-title">サーバー接続状況</h3>
+                    <div class="server-info">
+                        <div class="status-indicator">
+                            <span class="status-dot status-normal"></span>
+                            <span class="status-text">正常</span>
+                        </div>
+                        <p class="server-note">
+                            Wi-Fiの切り替えなどにより、サービスが正常に動作しない可能性がございます。サービスが正常に動作しない場合は再起動してください。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 接続方法 -->
+                <div class="card connection-method">
+                    <h3 class="card-title">接続方法</h3>
+                    <div class="method-options">
+                        <div class="method-option selected">
+                            <div class="method-name">WebSocket</div>
+                            <div class="method-description">Wi-Fiを使用した高速な手段</div>
+                        </div>
+                        <div class="method-option disabled">
+                            <div class="method-name">Bluetooth</div>
+                            <div class="method-description">最短距離で最速、かつ安全</div>
+                        </div>
+                        <div class="method-option">
+                            <div class="method-name">WebRTC</div>
+                            <div class="method-description">安全で、遠く離れても利用可能</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 空のスペース -->
+                <div class="card empty-space">
+                    <!-- 将来の機能用 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- デバイスを接続する -->
+        <section class="content-section" id="connect">
+            <h1 class="section-title">📲 デバイスを接続する</h1>
+
+            <div class="card">
+                <h3 class="card-title">ワンタイムパスキー</h3>
+                <div class="passkey-section">
+                    <div class="large-passkey" id="large-passkey">0000</div>
+                    <div class="passkey-timer-large">
+                        <div class="timer-bar-large">
+                            <div class="timer-progress-large" id="timer-progress-large"></div>
+                        </div>
+                        <div class="timer-text-large" id="timer-text-large">残り 30秒</div>
+                    </div>
+                    <p class="browser-warning">
+                        必ずChromeあるいはEdgeで接続してください。Safari等には対応していません
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">接続手順</h3>
+                <div class="connection-steps-container">
+                    <div class="steps-content">
+                        <ol class="connection-steps">
+                            <li>QRコードからアクセス</li>
+                            <li>画面からPCを選択</li>
+                            <li>ワンタイムパスキーを入力</li>
+                        </ol>
+                    </div>
+                    <div class="steps-qr">
+                        <div class="qr-code">
+                            <div class="qr-placeholder">QRコード</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">接続済みのデバイス</h3>
+                <div class="device-list">
+                    <div class="device-item">
+                        <div class="device-info">
+                            <div class="device-name">iPhone 15 Pro</div>
+                            <div class="device-status">接続中</div>
+                        </div>
+                        <button class="btn btn-danger btn-small">このデバイスを削除する</button>
+                    </div>
+                    <div class="device-item">
+                        <div class="device-info">
+                            <div class="device-name">iPad Air</div>
+                            <div class="device-status">3日前に接続</div>
+                        </div>
+                        <button class="btn btn-danger btn-small">このデバイスを削除する</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">注意</h3>
+                <ul class="notice-list">
+                    <li>
+                        Chrome・Edgeのみ対応です
+                    </li>
+                    <li>Wi-Fiの接続先は同じにしてください</li>
+                    <li>デバイス上ではタッチコントロールのみ有効です</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- カスタマイズ -->
+        <section class="content-section" id="customize">
+            <h1 class="section-title">🛠️ カスタマイズ</h1>
+            
+            <div class="card">
+                <div class="coming-soon">
+                    <h3>後日実装予定</h3>
+                    <p>カスタマイズ機能は今後のアップデートで追加される予定です。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 設定 -->
+        <section class="content-section" id="settings">
+            <h1 class="section-title">⚙️ 設定</h1>
+
+            <div class="card">
+                <h3 class="card-title">システム</h3>
+                <div class="form-group">
+                    <label class="form-label">
+                        Windowsのスタートアップ時に起動する
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        起動時にウィンドウを表示する
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">アプリケーション</h3>
+                <div class="form-group">
+                    <label class="form-label">
+                        自動アップデートを有効にする
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        異常時に自動で再起動する
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">通知</h3>
+                <div class="form-group">
+                    <label class="form-label">
+                        デスクトップ通知を有効にする
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notification-master" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+                <div class="notification-sub-settings" id="notification-sub-settings">
+                    <div class="form-group sub-setting">
+                        <label class="form-label">
+                            認証要求時
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="notification-sub" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </label>
+                    </div>
+                    <div class="form-group sub-setting">
+                        <label class="form-label">
+                            デバイス接続時
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="notification-sub" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </label>
+                    </div>
+                    <div class="form-group sub-setting">
+                        <label class="form-label">
+                            デバイス切断時
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="notification-sub">
+                                <span class="slider"></span>
+                            </label>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- リリースノート -->
+        <section class="content-section" id="release">
+            <h1 class="section-title">📝 リリースノート</h1>
+
+            <div class="card">
+                <h3 class="card-title">現在のアプリケーションバージョン</h3>
+                <div class="current-version">v2.1.0</div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">最新のリリースノート</h3>
+                <div class="release-item">
+                    <div class="release-header">
+                        <span class="release-version">v2.1.0</span>
+                        <span class="release-date">2024-01-15</span>
+                    </div>
+                    <div class="release-content">
+                        <h4>新機能</h4>
+                        <ul>
+                            <li>ワンタイムパスキー認証システムの追加</li>
+                            <li>デバイス接続状態のリアルタイム表示</li>
+                            <li>RTT（応答時間）監視機能</li>
+                        </ul>
+                        <h4>改善</h4>
+                        <ul>
+                            <li>接続の安定性向上</li>
+                            <li>UI/UXの改善</li>
+                        </ul>
+                        <h4>修正</h4>
+                        <ul>
+                            <li>Wi-Fi切り替え時の接続問題を修正</li>
+                            <li>メモリリークの問題を解決</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">更新設定</h3>
+                <p class="update-status">
+                    自動アップデートは<strong>有効</strong>になっています
+                    <a href="#" onclick="showSettingsSection()" class="settings-link">設定を変更</a>
+                </p>
+                <a href="https://github.com/your-repo/releases" target="_blank" class="btn btn-secondary">
+                    GitHub Releasesページを開く
+                </a>
+            </div>
+        </section>
+    </main>
+</div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+    let passkeyTimer = 30;
+    let timerInterval;
 
-            // タブ切り替え機能
-            const navItems = document.querySelectorAll('.nav-item');
-            const contentSections = document.querySelectorAll('.content-section');
-            navItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    const targetSection = this.getAttribute('data-section');
+    // パスキー生成
+    function generatePasskey() {
+        return Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    }
 
-                    // アクティブなナビゲーションアイテムを更新
-                    navItems.forEach(nav => nav.classList.remove('active'));
-                    this.classList.add('active');
+    // タイマー開始
+    function startPasskeyTimer() {
+        const passkeyElement = document.getElementById('passkey');
+        const largePasskeyElement = document.getElementById('large-passkey');
+        const timerProgressElement = document.getElementById('timer-progress');
+        const timerProgressLargeElement = document.getElementById('timer-progress-large');
+        const timerTextElement = document.getElementById('timer-text');
+        const timerTextLargeElement = document.getElementById('timer-text-large');
 
-                    // アクティブなコンテンツセクションを更新
-                    contentSections.forEach(section => {
-                        section.classList.remove('active');
-                    });
-                    document.getElementById(targetSection).classList.add('active');
-                });
+        function updateTimer() {
+            const progress = (passkeyTimer / 30) * 100;
+            
+            if (timerProgressElement) timerProgressElement.style.width = progress + '%';
+            if (timerProgressLargeElement) timerProgressLargeElement.style.width = progress + '%';
+            if (timerTextElement) timerTextElement.textContent = passkeyTimer + '秒';
+            if (timerTextLargeElement) timerTextLargeElement.textContent = '残り ' + passkeyTimer + '秒';
+
+            if (passkeyTimer <= 0) {
+                // 新しいパスキーを生成
+                const newPasskey = generatePasskey();
+                if (passkeyElement) passkeyElement.textContent = newPasskey;
+                if (largePasskeyElement) largePasskeyElement.textContent = newPasskey;
+                passkeyTimer = 30;
+            } else {
+                passkeyTimer--;
+            }
+        }
+
+        // 初期パスキー設定
+        const initialPasskey = generatePasskey();
+        if (passkeyElement) passkeyElement.textContent = initialPasskey;
+        if (largePasskeyElement) largePasskeyElement.textContent = initialPasskey;
+
+        // タイマー開始
+        timerInterval = setInterval(updateTimer, 1000);
+        updateTimer(); // 即座に実行
+    }
+
+    // タブ切り替え機能
+    const navItems = document.querySelectorAll('.nav-item');
+    const contentSections = document.querySelectorAll('.content-section');
+    
+    navItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const targetSection = this.getAttribute('data-section');
+
+            // アクティブなナビゲーションアイテムを更新
+            navItems.forEach(nav => nav.classList.remove('active'));
+            this.classList.add('active');
+
+            // アクティブなコンテンツセクションを更新
+            contentSections.forEach(section => {
+                section.classList.remove('active');
             });
-
-            // トグルスイッチの動作
-            const toggleSwitches = document.querySelectorAll('.toggle-switch input');
-            toggleSwitches.forEach(toggle => {
-                toggle.addEventListener('change', function() {
-                    console.log(`設定が変更されました: ${this.checked ? 'ON' : 'OFF'}`);
-                });
-            });
-
-            // ボタンクリックイベント
-            const buttons = document.querySelectorAll('.btn');
-            buttons.forEach(button => {
-                button.addEventListener('click', function() {
-                    console.log(`ボタンがクリックされました: ${this.textContent}`);
-                });
-            });
+            document.getElementById(targetSection).classList.add('active');
         });
+    });
+
+    // デバイス接続状態の切り替え（デモ用）
+    function toggleConnectionStatus() {
+        const disconnectedState = document.getElementById('disconnected-state');
+        const connectedState = document.getElementById('connected-state');
+        
+        if (disconnectedState.style.display !== 'none') {
+            disconnectedState.style.display = 'none';
+            connectedState.style.display = 'block';
+        } else {
+            disconnectedState.style.display = 'block';
+            connectedState.style.display = 'none';
+        }
+    }
+
+    // グローバル関数
+    window.showConnectSection = function() {
+        // デバイス接続セクションに移動
+        navItems.forEach(nav => nav.classList.remove('active'));
+        document.querySelector('[data-section="connect"]').classList.add('active');
+        
+        contentSections.forEach(section => section.classList.remove('active'));
+        document.getElementById('connect').classList.add('active');
+    };
+
+    window.showSettingsSection = function() {
+        // 設定セクションに移動
+        navItems.forEach(nav => nav.classList.remove('active'));
+        document.querySelector('[data-section="settings"]').classList.add('active');
+        
+        contentSections.forEach(section => section.classList.remove('active'));
+        document.getElementById('settings').classList.add('active');
+    };
+
+    // トグルスイッチの動作
+    const toggleSwitches = document.querySelectorAll('.toggle-switch input');
+    toggleSwitches.forEach(toggle => {
+        toggle.addEventListener('change', function() {
+            console.log(`設定が変更されました: ${this.checked ? 'ON' : 'OFF'}`);
+        });
+    });
+
+    // ボタンクリックイベント
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            if (this.textContent.includes('デバイスを接続する')) {
+                return; // showConnectSection が処理
+            }
+            if (this.textContent.includes('設定を変更')) {
+                return; // showSettingsSection が処理
+            }
+            if (this.textContent.includes('再起動する')) {
+                alert('サービスを再起動しています...');
+                return;
+            }
+            if (this.textContent.includes('削除する')) {
+                if (confirm('このデバイスを削除しますか？')) {
+                    this.closest('.device-item').remove();
+                }
+                return;
+            }
+            console.log(`ボタンがクリックされました: ${this.textContent}`);
+        });
+    });
+
+    // パスキータイマー開始
+    startPasskeyTimer();
+
+    // デモ用：5秒後に接続状態を切り替え
+    setTimeout(toggleConnectionStatus, 5000);
+});
     </script>
 </body>
 </html>
