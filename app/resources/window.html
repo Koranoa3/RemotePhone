@@ -311,7 +311,7 @@
                     自動アップデートは<strong>有効</strong>になっています
                     <a href="#" onclick="showSettingsSection()" class="settings-link">設定を変更</a>
                 </p>
-                <a href="https://github.com/your-repo/releases" target="_blank" class="btn btn-secondary">
+                <a href="https://github.com/KoralMint/RemotePhone/releases" target="_blank" class="btn btn-secondary">
                     GitHub Releasesページを開く
                 </a>
             </div>
@@ -320,7 +320,10 @@
 </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+
+    const SERVER_URL = "http://skyboxx.tplinkdns.com:3000";
+
+    document.addEventListener('DOMContentLoaded', function() {
     let passkeyTimer = 30;
     let timerInterval;
 
@@ -451,6 +454,10 @@
             console.log(`ボタンがクリックされました: ${this.textContent}`);
         });
     });
+
+    // リリースノート取得
+    const releaseNote = document.querySelector('.release-item .release-content');
+    fetch('https://api.github.com/repos/your-repo/releases/latest')
 
     // パスキータイマー開始
     startPasskeyTimer();

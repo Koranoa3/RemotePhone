@@ -319,7 +319,7 @@ body {
     font-size: 24px;
     font-weight: bold;
     color: var(--accent-main);
-    text-align: center;
+    text-align: left;
 }
 .release-item {
     border-left: 4px solid var(--accent-main);
@@ -327,7 +327,8 @@ body {
 }
 .release-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: start;
+    gap: 16px;
     align-items: center;
     margin-bottom: 16px;
 }
