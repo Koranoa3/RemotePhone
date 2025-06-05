@@ -65,7 +65,7 @@ def register_with_retry():
 
 ### tray icon ###############################
 
-from app.host.systemtray import setup_tray, update_tray
+from app.host.systemtray import run_tray, update_tray
 import app.host.systemtray as systemtray  # Assign register_with_retry
 
 # Add after defining register_with_retry
@@ -86,17 +86,12 @@ def main():
     else:
         logger.info(f"Using default server URL: {SERVER_URL}")
 
-    # Hidden Tk window (needed only once)
-    root = tk.Tk()
-    root.withdraw()
-    systemtray.root = root
 
     # Start connection thread
     register_thread = threading.Thread(target=register_with_retry, daemon=True)
     register_thread.start()
 
-    threading.Thread(target=setup_tray, daemon=True).start()
-    root.mainloop()
+    run_tray()
     logger.info("Application exited.")
     
 if __name__ == "__main__":

@@ -1,25 +1,40 @@
 import webview
-webview.config.gui = 'cef'
+import multiprocessing
 
-def _create_window():
+from logging import getLogger
+logger = getLogger(__name__)
+
+Process = multiprocessing.Process
+webview_process:Process = None
+
+webview.gui = 'cef'
+
+def run_webview():
     """
     Create a webview window.
     """
-    window = webview.create_window(
-        "RemotePhone", "ui/index.html",
-        width=800, height=600,
-        resizable=True, min_size=(800, 600), fullscreen=False,
+    webview.create_window(
+        "RemotePhone", "resources/window.html",
+        width=1024, height=769, background_color='#222222',
+        resizable=True, min_size=(1024, 769),
         js_api= {
             
         }
     )
-    return window
+    webview.start(debug=True)
 
-def run_window():
-    """
-    Run the webview window.
-    
-    Args:
-        window (webview.Window): The webview window to run.
-    """
-    webview.start(debug=True, window=_create_window())
+def start_webview_process():
+    global webview_process
+    if not webview_process or not webview_process.is_alive():
+        logger.info("Starting webview process.")
+        webview_process = Process(target=run_webview)
+        webview_process.start()
+
+def stop_webview_process():
+    global webview_process
+    if webview_process and webview_process.is_alive():
+        logger.info("Stopping webview process.")
+        webview_process.terminate()
+        webview_process.join()
+    webview_process = None
+    logger.info("Webview process stopped.")
