@@ -1,3 +1,4 @@
+from app.host import host_config
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -54,28 +55,18 @@ class ConnectApi:
         return True
 
 class SettingsApi:
-    _settings = {
-        "system": {"run_on_startup": True, "show_window_on_start": True},
-        "application": {"enable_auto_update": True, "auto_restart_on_error": False},
-        "notification": {
-            "enable_desktop_notification": True,
-            "notify_authentication_request": True,
-            "notify_device_connect": True,
-            "notify_device_disconnect": False
-        }
-    }
-
     def get_settings(self):
-        logger.info("get_settings")
-        return self._settings
+        logger.debug("get_settings")
+        return host_config.load()
 
     def set_settings(self, settings):
+        current_settings = host_config.load()
         for key, value in settings.items():
-            if key in self._settings and isinstance(value, dict):
-                self._settings[key].update(value)
+            if key in current_settings and isinstance(value, dict):
+                current_settings[key].update(value)
             else:
-                self._settings[key] = value
-        logger.info(f"set_settings")
+                current_settings[key] = value
+        host_config.save(current_settings)
         return True
 
 class ReleaseApi:
