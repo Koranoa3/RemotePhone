@@ -341,6 +341,9 @@ body {
 }
 .release-content li { margin-bottom: 4px; }
 .update-status { margin-bottom: 16px; }
+.release-details {
+    margin-bottom: 20px;
+}
 .settings-link {
     color: var(--accent-main);
     text-decoration: none;

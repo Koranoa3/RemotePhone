@@ -1,10 +1,11 @@
 from app.host import host_config
+from app.common import Version
 
 from logging import getLogger
 logger = getLogger(__name__)
 
 
-# --- APIクラス定義 ---
+# --- API classes ---
 class HomeApi:
     def get_device_connection_status(self):
         # 仮実装
@@ -71,10 +72,36 @@ class SettingsApi:
 
 class ReleaseApi:
     def get_current_application_version(self):
-        # 仮実装
-        return {"version": "v2.1.0"}
+        return {"version": Version.get_current_version()}
 
-# --- API統合 ---
+    def get_current_version_info(self):
+
+        current_json = Version.get_current()
+        return {
+            "version": current_json.get("version"),
+            "released_at": current_json.get("released_at"),
+            "release_notes": current_json.get("release_notes")
+        }
+
+    def check_for_updates(self):
+        
+        if Version.is_latest():
+            return {"update_available": False}
+
+        latest_json = Version.get_latest()
+        return {
+            "update_available": True,
+            "version": latest_json.get("version"),
+            "released_at": latest_json.get("released_at"),
+            "release_notes": latest_json.get("release_notes")
+        }
+    
+    def update_now(self):
+        # 仮実装
+        logger.info("update_now called")
+        return True
+
+# --- API integration ---
 class Api:
     home = HomeApi()
     connect = ConnectApi()

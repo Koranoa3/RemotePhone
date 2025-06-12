@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>アプリケーション設定</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 
 <body>
@@ -275,41 +276,42 @@
 
                 <div class="card">
                     <h3 class="card-title">現在のアプリケーションバージョン</h3>
-                    <div class="current-version">v2.1.0</div>
+                    <div class="current-version"></div>
+                </div>
+
+                <div class="card" id="update-available-container">
+                    <h3 class="card-title">更新が利用可能</h3>
+                    <div class="update-message">
+                        アプリケーションの更新が利用可能です。
+                    </div>
+                    <details class="release-details">
+                        <summary>更新情報</summary>
+                        <div class="release-item">
+                            <div class="release-header">
+                                <span class="release-version" id="update-available-version"></span>
+                                <span class="release-date" id="update-available-date"></span>
+                            </div>
+                            <div class="release-content" id="update-available-content"></div>
+                        </div>
+                    </details>
+                    <button class="btn btn-primary" id="update-now-btn" onclick="pywebview.api.release.update_now()">今すぐ更新</button>
                 </div>
 
                 <div class="card">
-                    <h3 class="card-title">最新のリリースノート</h3>
+                    <h3 class="card-title">リリースノート</h3>
                     <div class="release-item">
                         <div class="release-header">
-                            <span class="release-version">v2.1.0</span>
-                            <span class="release-date">2024-01-15</span>
+                            <span class="release-version" id="current-release-version">読み込み中...</span>
+                            <span class="release-date" id="current-release-date"></span>
                         </div>
-                        <div class="release-content">
-                            <h4>新機能</h4>
-                            <ul>
-                                <li>ワンタイムパスキー認証システムの追加</li>
-                                <li>デバイス接続状態のリアルタイム表示</li>
-                                <li>RTT（応答時間）監視機能</li>
-                            </ul>
-                            <h4>改善</h4>
-                            <ul>
-                                <li>接続の安定性向上</li>
-                                <li>UI/UXの改善</li>
-                            </ul>
-                            <h4>修正</h4>
-                            <ul>
-                                <li>Wi-Fi切り替え時の接続問題を修正</li>
-                                <li>メモリリークの問題を解決</li>
-                            </ul>
-                        </div>
+                        <div class="release-content" id="current-release-content">...</div>
                     </div>
                 </div>
 
                 <div class="card">
                     <h3 class="card-title">更新設定</h3>
                     <p class="update-status">
-                        自動アップデートは<strong>有効</strong>になっています
+                        自動アップデートは<strong id="auto-update-status">無効</strong>になっています
                         <a href="#" onclick="showSettingsSection()" class="settings-link">設定を変更</a>
                     </p>
                     <a href="https://github.com/KoralMint/RemotePhone/releases" target="_blank"
@@ -324,6 +326,7 @@
     <script>
 
         const SERVER_URL = "http://skyboxx.tplinkdns.com:8000";
+        const LATEST_API_URL = "http://skyboxx.tplinkdns.com:8000/api/releases/latest";
 
         window.addEventListener('pywebviewready', async function () {
             console.log('initializing app...');
@@ -413,7 +416,6 @@
                     };
                 });
             }
-            updateRegisteredDevices();
 
             // --- 設定 ---
             async function updateSettings() {
@@ -457,20 +459,36 @@
             });
 
             // --- リリースノート ---
-            async function updateReleaseNote() {
+            async function updateCurrentReleaseNotes() {
                 // バージョン
                 const ver = await pywebview.api.release.get_current_application_version();
                 document.querySelector('.current-version').textContent = ver.version;
-                // 最新リリースノート
-                const notes = await fetch('https://api.github.com/repos/KoralMint/RemotePhone/releases').then(r => r.json());
-                if (notes.length > 0) {
-                    const latest = notes[0];
-                    document.querySelector('.release-version').textContent = latest.tag_name;
-                    document.querySelector('.release-date').textContent = latest.published_at.split('T')[0];
-                    document.querySelector('.release-content ul').innerHTML = latest.body.split('\n').map(line => `<li>${line}</li>`).join('');
+                // リリースノート
+                const current = await pywebview.api.release.get_current_version_info();
+                if (current) {
+                    document.getElementById('current-release-version').textContent = current.version;
+                    document.getElementById('current-release-date').textContent = current.released_at;
+                    document.getElementById('current-release-content').innerHTML = marked.parse(current.release_notes);
+                }
+                // 自動アップデート設定
+                const autoUpdateStatus = document.querySelector('input[type=checkbox][name=enable_auto_update]').checked;
+                document.getElementById('auto-update-status').textContent = autoUpdateStatus ? '有効' : '無効';
+            }
+
+            // 更新確認
+            async function checkForUpdates() {
+                const result = await pywebview.api.release.check_for_updates();
+                if (result.update_available) {
+                    // 最新の更新情報を画面に反映
+                    document.getElementById('update-available-version').textContent = result.version;
+                    document.getElementById('update-available-date').textContent = result.released_at;
+                    document.getElementById('update-available-content').innerHTML = marked.parse(result.release_notes);
+                    document.getElementById('update-available-container').style.display = 'block';
+                } else {
+                    document.getElementById('update-available-container').style.display = 'none';
                 }
             }
-            updateReleaseNote();
+            window.checkForUpdates = checkForUpdates;
 
             // タブ切り替え時に各セクションのデータ再取得
             document.querySelectorAll('.nav-item').forEach(item => {
@@ -479,7 +497,7 @@
                     if (section === 'home') updateHomeStatus();
                     if (section === 'connect') { updatePasskey(); updateRegisteredDevices(); }
                     if (section === 'settings') updateSettings();
-                    if (section === 'release') updateReleaseNote();
+                    if (section === 'release') { updateCurrentReleaseNotes(); checkForUpdates(); }
                 });
             });
 
