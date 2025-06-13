@@ -182,27 +182,32 @@ document.addEventListener('DOMContentLoaded', function () {
     // タブ切り替え機能
     const navItems = document.querySelectorAll('.nav-item');
     const contentSections = document.querySelectorAll('.content-section');
-    
+
     navItems.forEach(item => {
         item.addEventListener('click', function () {
             const targetSection = this.getAttribute('data-section');
-    
+
             // アクティブなナビゲーションアイテムを更新
             navItems.forEach(nav => nav.classList.remove('active'));
             this.classList.add('active');
-    
+
             // アクティブなコンテンツセクションを更新
             contentSections.forEach(section => {
                 section.classList.remove('active');
             });
             document.getElementById(targetSection).classList.add('active');
         });
-    });
-
-    window.showSettingsSection = () => {
+    }); window.showSettingsSection = () => {
         navItems.forEach(nav => nav.classList.remove('active'));
         document.querySelector('.nav-item[data-section="settings"]').classList.add('active');
         contentSections.forEach(section => section.classList.remove('active'));
         document.getElementById('settings').classList.add('active');
+    }
+
+    window.showConnectSection = () => {
+        navItems.forEach(nav => nav.classList.remove('active'));
+        document.querySelector('.nav-item[data-section="connect"]').classList.add('active');
+        contentSections.forEach(section => section.classList.remove('active'));
+        document.getElementById('connect').classList.add('active');
     }
 });

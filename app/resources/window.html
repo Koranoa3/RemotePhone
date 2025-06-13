@@ -37,22 +37,20 @@
                         <h3 class="card-title">デバイス接続状態</h3>
                         <div id="device-connection-status">
                             <!-- 未接続状態 -->
-                            <div class="connection-status disconnected" id="disconnected-state">
+                            <div class="connection-status text-center" id="disconnected-state">
                                 <div class="status-text inactive">接続されていません</div>
                                 <div class="connect-action">
-                                    <button class="btn btn-primary connect-btn"
-                                        onclick="showConnectSection()">デバイスを接続する</button>
+                                    <button class="btn btn-primary" onclick="showConnectSection()">デバイスを接続する</button>
                                 </div>
                             </div>
 
                             <!-- 接続中状態 -->
-                            <div class="connection-status connected" id="connected-state" style="display: none;">
+                            <div class="connection-status text-center" id="connected-state" style="display: none;">
                                 <div class="status-text active">接続中</div>
-                                <div class="device-info">
+                                <div class="device-info text-left">
                                     <div class="device-name">iPhone 15 Pro</div>
                                     <div class="rtt-status">
-                                        <span class="rtt-label">RTT:</span>
-                                        <span class="rtt-value stable">安定</span>
+                                        RTT: <span class="rtt-value stable">安定</span>
                                     </div>
                                     <div class="connection-time">接続時間: 00:15:32</div>
                                 </div>
@@ -63,12 +61,12 @@
                     <!-- サーバー接続状況 -->
                     <div class="card server-status">
                         <h3 class="card-title">サーバー接続状況</h3>
-                        <div class="server-info">
+                        <div class="server-info text-center">
                             <div class="status-indicator">
                                 <span class="status-dot status-normal"></span>
                                 <span class="status-text">正常</span>
                             </div>
-                            <p class="server-note">
+                            <p class="server-note text-left opacity-8">
                                 Wi-Fiの切り替えなどにより、サービスが正常に動作しない可能性がございます。サービスが正常に動作しない場合は再起動してください。
                             </p>
                         </div>
@@ -91,11 +89,12 @@
                                 <div class="method-description">安全で、遠く離れても利用可能</div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- 空のスペース -->
-                    <div class="card empty-space">
-                        <!-- 将来の機能用 -->
+                    </div> <!-- 接続統計 (将来の機能用) -->
+                    <div class="card empty-space text-center">
+                        <div class="coming-soon">
+                            <h3>統計情報</h3>
+                            <p>接続統計とパフォーマンス情報がここに表示されます。</p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -106,14 +105,12 @@
 
                 <div class="card">
                     <h3 class="card-title">ワンタイムパスキー</h3>
-                    <div class="passkey-section">
+                    <div class="passkey-display text-center">
                         <div class="large-passkey" id="large-passkey">0000</div>
-                        <div class="passkey-timer-large">
-                            <div class="timer-bar-large">
-                                <div class="timer-progress-large" id="timer-progress-large"></div>
-                            </div>
-                            <div class="timer-text-large" id="timer-text-large">残り 30秒</div>
+                        <div class="timer-bar-large">
+                            <div class="timer-progress-large" id="timer-progress-large"></div>
                         </div>
+                        <div class="timer-text-large" id="timer-text-large">残り 30秒</div>
                         <p class="browser-warning">
                             必ずChromeあるいはEdgeで接続してください。Safari等には対応していません
                         </p>
@@ -295,7 +292,8 @@
                             <div class="release-content" id="update-available-content"></div>
                         </div>
                     </details>
-                    <button class="btn btn-primary" id="update-now-btn" onclick="pywebview.api.release.update_now()">今すぐ更新</button>
+                    <button class="btn btn-primary" id="update-now-btn"
+                        onclick="pywebview.api.release.update_now()">今すぐ更新</button>
                 </div>
 
                 <div class="card">
