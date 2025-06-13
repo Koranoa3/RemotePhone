@@ -1,11 +1,12 @@
 .venv
+.vscode/
 __pycache__
 registered_uuids.txt
 application.log
+client_config.json
+host_config.json
 build/
 dist/
-RemotePhoneHost.spec
 build.txt
-Update.spec
+RemotePhoneHost.spec
 RemotePhoneLauncher.spec
-.vscode/
