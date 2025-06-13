@@ -114,7 +114,7 @@ window.addEventListener('pywebviewready', async function () {
             btn.onclick = async function () {
                 if (confirm('このデバイスを削除しますか？')) {
                     await pywebview.api.connect.delete_registered_device(this.dataset.uuid);
-                    updateRegisteredDevices();
+                    await updateRegisteredDevices();
                 }
             };
         });
