@@ -13,6 +13,16 @@ window.addEventListener('pywebviewready', async function () {
             document.querySelector('#connected-state .device-name').textContent = device.device_name;
             document.querySelector('#connected-state .rtt-value').textContent = device.rtt;
             document.querySelector('#connected-state .connection-time').textContent = `接続時間: ${device.since}`;
+
+            const rttElem = document.querySelector('#connected-state .rtt-value');
+            rttElem.classList.remove('stable', 'unstable', 'very-unstable');
+            if (device.rtt_status === 'stable') {
+                rttElem.classList.add('stable');
+            } else if (device.rtt_status === 'unstable') {
+                rttElem.classList.add('unstable');
+            } else if (device.rtt_status === 'very-unstable') {
+                rttElem.classList.add('very-unstable');
+            }
         } else {
             document.getElementById('disconnected-state').style.display = 'block';
             document.getElementById('connected-state').style.display = 'none';

@@ -12,7 +12,8 @@ class HomeApi:
         return {
             "status": "connected",  # or "not connected"
             "device_name": "iPhone 15 Pro",
-            "rtt": "安定",
+            "rtt": "25ms",
+            "rtt_status": "stable",
             "since": "00:15:32"
         }
 
