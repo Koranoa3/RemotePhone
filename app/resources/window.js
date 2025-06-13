@@ -79,12 +79,32 @@ window.addEventListener('pywebviewready', async function () {
         const container = document.querySelector('.device-list');
         container.innerHTML = '';
         list.forEach(dev => {
+            // dev.last_connectionは分単位の経過時間と仮定
+            let statusText = '';
+            if (dev.last_connection === 0) {
+                statusText = '接続中';
+            } else if (dev.last_connection < 60) {
+                statusText = `${dev.last_connection}分前に接続`;
+            } else if (dev.last_connection < 60 * 24) {
+                const hours = Math.floor(dev.last_connection / 60);
+                statusText = `${hours}時間前に接続`;
+            } else if (dev.last_connection < 60 * 24 * 7) {
+                const days = Math.floor(dev.last_connection / (60 * 24));
+                statusText = `${days}日前に接続`;
+            } else if (dev.last_connection < 60 * 24 * 30) {
+                const weeks = Math.floor(dev.last_connection / (60 * 24 * 7));
+                statusText = `${weeks}週間前に接続`;
+            } else {
+                const months = Math.floor(dev.last_connection / (60 * 24 * 30));
+                statusText = `${months}ヶ月前に接続`;
+            }
+
             const el = document.createElement('div');
             el.className = 'device-item';
             el.innerHTML = `
                 <div class="device-info">
                     <div class="device-name">${dev.name}</div>
-                    <div class="device-status">${dev.last_connection === 0 ? '接続中' : dev.last_connection + '分前に接続'}</div>
+                    <div class="device-status">${statusText}</div>
                 </div>
                 <button class="btn btn-danger btn-small" data-uuid="${dev.uuid}">このデバイスを削除する</button>
             `;
