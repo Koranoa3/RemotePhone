@@ -1,5 +1,5 @@
 from app.host import host_config
-from app.common import Version
+from app.host.version import Version
 
 from logging import getLogger
 logger = getLogger(__name__)
