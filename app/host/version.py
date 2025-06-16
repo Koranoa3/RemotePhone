@@ -61,13 +61,8 @@ class Version:
 
         Returns:
             dict: Details of the current version (including release notes)
-                  If it's the latest version, returns the result of get_latest()
                   Returns None if retrieval fails
         """
-        # If it's the latest version, return the latest info
-        if Version.is_latest():
-            return Version.get_latest()
-
         # Get the current version number
         version = Version.get_current_version()
         current_path = safe_resource_path("app/resources/current_release.json")
@@ -97,6 +92,7 @@ class Version:
             with open(current_path, "w", encoding="utf-8") as f:
                 json.dump(current_json, f, ensure_ascii=False, indent=2)
 
+            return current_json
         except requests.exceptions.RequestException as e:
             logger.error(f"Network error while fetching the current version info: {e}")
             return None
@@ -146,7 +142,6 @@ class Version:
                   Returns None if retrieval fails
         """
         latest_path = resource_path("app/resources/latest_release.json")
-        current_version = Version.get_current_version()
         latest_json = None
 
         # If the cache file exists, load it
@@ -154,11 +149,7 @@ class Version:
             try:
                 with open(latest_path, "r", encoding="utf-8") as f:
                     latest_json = json.load(f)
-
-                # If the cached latest version matches the current version
-                latest_version = latest_json.get("version")
-                if latest_version == current_version:
-                    return latest_json
+                return latest_json
             except Exception as e:
                 logger.error(f"Failed to read latest_release.json: {e}")
         try:
