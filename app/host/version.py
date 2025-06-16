@@ -6,6 +6,9 @@ This module provides the following features:
 - Retrieve and cache the latest version information
 - Compare versions and check for updates
 - Get release notes
+
+Dependencies:
+- requests: For making HTTP requests to retrieve version information
 """
 
 import os
@@ -14,8 +17,33 @@ import requests
 
 from app.common import resource_path
 
+from logging import getLogger
+logger = getLogger(__name__)
+
+def safe_resource_path(relative_path: str) -> str:
+    """
+    Wrapper for resource_path to handle edge cases like missing files or incorrect paths.
+
+    Args:
+        relative_path (str): The relative path to the resource.
+
+    Returns:
+        str: The absolute path to the resource, or None if the path is invalid.
+    """
+    try:
+        path = resource_path(relative_path)
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"Resource not found: {path}")
+        return path
+    except Exception as e:
+        logger.error(f"Error resolving resource path for {relative_path}: {e}")
+        return None
+
+from app.common import resource_path
+
 # Base URL for the server API
 VERSION_INFO_URL = "http://skyboxx.tplinkdns.com:8000/api/releases/"
+DEFAULT_TIMEOUT = 5  # Default timeout for network requests
 
 
 class Version:
@@ -42,7 +70,7 @@ class Version:
 
         # Get the current version number
         version = Version.get_current_version()
-        current_path = resource_path("app/resources/current_release.json")
+        current_path = safe_resource_path("app/resources/current_release.json")
         current_json = None
 
         # If the cache file exists, load it
@@ -56,11 +84,11 @@ class Version:
                 if saved_version == version:
                     return current_json
             except Exception as e:
-                print(f"[Error] Failed to read current_release.json: {e}")
+                logger.error(f"Failed to read current_release.json: {e}")
 
         # If the cache is invalid or the version is different, get from server
         try:
-            res = requests.get(VERSION_INFO_URL + version, timeout=5)
+            res = requests.get(VERSION_INFO_URL + version, timeout=DEFAULT_TIMEOUT)
             res.raise_for_status()
             current_json = res.json()
 
@@ -69,9 +97,11 @@ class Version:
             with open(current_path, "w", encoding="utf-8") as f:
                 json.dump(current_json, f, ensure_ascii=False, indent=2)
 
-            return current_json
-        except Exception as e:
-            print(f"[Error] Failed to fetch or save the current version info: {e}")
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Network error while fetching the current version info: {e}")
+            return None
+        except OSError as e:
+            logger.error(f"File system error while saving the current version info: {e}")
             return None
 
     @staticmethod
@@ -86,9 +116,17 @@ class Version:
                  Returns "unknown" if the file does not exist
         """
         try:
+            version_path = safe_resource_path("app/resources/version")
+            if version_path:
+                with open(version_path, "r") as f:
             # Read the version number from the version file
-            with open(resource_path("app/resources/version"), "r") as f:
-                return f.read().strip()
+                    try:
+                        with open(resource_path("app/resources/version"), "r") as f:
+                            return f.read().strip()
+                    except Exception as e:
+                        import logging
+                        logging.error(f"Error reading version file: {e}")
+                        return "unknown"
         except FileNotFoundError:
             # If the version file is not found
             return "unknown"
@@ -122,11 +160,9 @@ class Version:
                 if latest_version == current_version:
                     return latest_json
             except Exception as e:
-                print(f"[Error] Failed to read latest_release.json: {e}")
-
-        # If the cache is invalid or the version is different, get the latest info from server
+                logger.error(f"Failed to read latest_release.json: {e}")
         try:
-            res = requests.get(VERSION_INFO_URL + "latest", timeout=5)
+            res = requests.get(VERSION_INFO_URL + "latest", timeout=DEFAULT_TIMEOUT)
             res.raise_for_status()
             latest_json = res.json()
 
@@ -136,8 +172,11 @@ class Version:
                 json.dump(latest_json, f, ensure_ascii=False, indent=2)
 
             return latest_json
-        except Exception as e:
-            print(f"[Error] Failed to fetch or save the latest version info: {e}")
+        except requests.exceptions.RequestException as e:
+            print(f"[Error] Network error while fetching the latest version info: {e}")
+            return None
+        except OSError as e:
+            print(f"[Error] File system error while saving the latest version info: {e}")
             return None
 
     @staticmethod
