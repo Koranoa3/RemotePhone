@@ -59,7 +59,7 @@ class Release:
         Args:
             version (str): Version string
         """
-        self.json_path = safe_resource_path("app/resources/releases_info.json")
+        self.json_path = safe_resource_path(".cache/releases_info.json")
         self._api_url = VERSION_INFO_URL + version
         self._raw_data = {}
         self._version = version

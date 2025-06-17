@@ -1,5 +1,6 @@
 .venv
 .vscode/
+.cache/
 __pycache__
 registered_uuids.txt
 application.log
@@ -10,4 +11,3 @@ dist/
 build.txt
 RemotePhoneHost.spec
 RemotePhoneLauncher.spec
-app/resources/releases_info.json
