@@ -39,178 +39,204 @@ def safe_resource_path(relative_path: str) -> str:
         logger.error(f"Error resolving resource path for {relative_path}: {e}")
         return None
 
-from app.common import resource_path
-
 # Base URL for the server API
 VERSION_INFO_URL = "http://skyboxx.tplinkdns.com:8000/api/releases/"
 DEFAULT_TIMEOUT = 5  # Default timeout for network requests
 
 
-class Version:
+class Release:
     """
-    Version management class
+    Release information class
 
-    Manages application version information and provides
-    functions to retrieve and cache the latest info from the server
+    Encapsulates application release information and provides
+    methods to access version details
     """
 
-    @staticmethod
-    def get_current() -> dict:
+    def __init__(self, version: str):
         """
-        Get details of the current version
+        Initialize Release object
 
-        Returns:
-            dict: Details of the current version (including release notes)
-                  Returns None if retrieval fails
+        Args:
+            version (str): Version string
         """
-        # Get the current version number
-        version = Version.get_current_version()
-        current_path = safe_resource_path("app/resources/current_release.json")
-        current_json = None
+        self.json_path = safe_resource_path("app/resources/releases_info.json")
+        self._api_url = VERSION_INFO_URL + version
+        self._raw_data = {}
+        self._version = version
+        self._load_data()
 
-        # If the cache file exists, load it
-        if os.path.exists(current_path):
+    def _load_data(self):
+        """Load release data from cache or API"""
+        # Try to load from cache first
+        if self.json_path and os.path.exists(self.json_path):
             try:
-                with open(current_path, "r", encoding="utf-8") as f:
-                    current_json = json.load(f)
-
-                # If the cached version matches the current version
-                saved_version = current_json.get("version")
-                if saved_version == version:
-                    return current_json
+                with open(self.json_path, "r", encoding="utf-8") as f:
+                    cache_data = json.load(f)
+                    if self._version in cache_data:
+                        self._raw_data = cache_data[self._version]
+                        return
             except Exception as e:
-                logger.error(f"Failed to read current_release.json: {e}")
+                logger.error(f"Failed to read releases_info.json: {e}")
 
-        # If the cache is invalid or the version is different, get from server
+        # If not in cache, fetch from API
+        self._fetch_from_api()
+
+    def _fetch_from_api(self):
+        """Fetch release data from API and cache it"""
         try:
-            res = requests.get(VERSION_INFO_URL + version, timeout=DEFAULT_TIMEOUT)
+            res = requests.get(self._api_url, timeout=DEFAULT_TIMEOUT)
             res.raise_for_status()
-            current_json = res.json()
-
-            # Save the retrieved info to cache
-            os.makedirs(os.path.dirname(current_path), exist_ok=True)
-            with open(current_path, "w", encoding="utf-8") as f:
-                json.dump(current_json, f, ensure_ascii=False, indent=2)
-
-            return current_json
+            self._raw_data = res.json()
+            
+            # Save to cache
+            self._save_to_cache()
         except requests.exceptions.RequestException as e:
-            logger.error(f"Network error while fetching the current version info: {e}")
-            return None
-        except OSError as e:
-            logger.error(f"File system error while saving the current version info: {e}")
-            return None
-
-    @staticmethod
-    def get_current_version() -> str:
-        """
-        Get the current application version number
-
-        Reads the version string from the version file
-
-        Returns:
-            str: Version number string (e.g., "v1.0.0")
-                 Returns "unknown" if the file does not exist
-        """
-        try:
-            version_path = safe_resource_path("app/resources/version")
-            if version_path:
-                with open(version_path, "r") as f:
-            # Read the version number from the version file
-                    try:
-                        with open(resource_path("app/resources/version"), "r") as f:
-                            return f.read().strip()
-                    except Exception as e:
-                        import logging
-                        logging.error(f"Error reading version file: {e}")
-                        return "unknown"
-        except FileNotFoundError:
-            # If the version file is not found
-            return "unknown"
+            logger.error(f"Network error while fetching release info for {self._version}: {e}")
         except Exception as e:
-            # For other errors
-            return "unknown"
+            logger.error(f"Error while fetching release info for {self._version}: {e}")
 
-    @staticmethod
-    def get_latest() -> dict:
-        """
-        Get details of the latest version
-
-        Retrieves the latest info from the server and caches it locally
-
-        Returns:
-            dict: Details of the latest version (version number, release notes, etc.)
-                  Returns None if retrieval fails
-        """
-        latest_path = resource_path("app/resources/latest_release.json")
-        latest_json = None
-
-        # If the cache file exists, load it
-        if os.path.exists(latest_path):
-            try:
-                with open(latest_path, "r", encoding="utf-8") as f:
-                    latest_json = json.load(f)
-                return latest_json
-            except Exception as e:
-                logger.error(f"Failed to read latest_release.json: {e}")
+    def _save_to_cache(self):
+        """Save release data to cache file"""
         try:
-            res = requests.get(VERSION_INFO_URL + "latest", timeout=DEFAULT_TIMEOUT)
-            res.raise_for_status()
-            latest_json = res.json()
+            cache_data = {}
+            if self.json_path and os.path.exists(self.json_path):
+                with open(self.json_path, "r", encoding="utf-8") as f:
+                    cache_data = json.load(f)
+            
+            cache_data[self._version] = self._raw_data
+            
+            # Ensure directory exists
+            if self.json_path:
+                os.makedirs(os.path.dirname(self.json_path), exist_ok=True)
+                with open(self.json_path, "w", encoding="utf-8") as f:
+                    json.dump(cache_data, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.error(f"Error while saving release info to cache: {e}")
 
-            # Save the retrieved latest info to cache
-            os.makedirs(os.path.dirname(latest_path), exist_ok=True)
-            with open(latest_path, "w", encoding="utf-8") as f:
-                json.dump(latest_json, f, ensure_ascii=False, indent=2)
-
-            return latest_json
-        except requests.exceptions.RequestException as e:
-            print(f"[Error] Network error while fetching the latest version info: {e}")
-            return None
-        except OSError as e:
-            print(f"[Error] File system error while saving the latest version info: {e}")
-            return None
-
-    @staticmethod
-    def get_latest_version() -> str:
+    def is_latest(self) -> bool:
         """
-        Get only the latest version number
+        Check if this release is the latest version
 
         Returns:
-            str: Latest version number (e.g., "1.2.0")
-                 Returns None if retrieval fails
+            bool: True if this is the latest version
         """
-        latest_json = Version.get_latest()
-        if latest_json and isinstance(latest_json, dict):
-            return latest_json.get("version")
-        return None
+        latest_version = get_latest_version()
+        return self._version == latest_version
 
-    @staticmethod
-    def get_latest_release_notes() -> str:
+    def as_json(self) -> dict:
         """
-        Get the release notes for the latest version
+        Get raw release data
 
         Returns:
-            str: Release notes for the latest version (in Markdown format)
-                 Returns None if retrieval fails
+            dict: Raw release information data
         """
-        latest_json = Version.get_latest()
-        if latest_json and isinstance(latest_json, dict):
-            return latest_json.get("release_notes")
-        return None
+        return self._raw_data.copy()
 
-    @staticmethod
-    def is_latest() -> bool:
+    def get_version(self) -> str:
         """
-        Determine if the current version is the latest
-
-        Compares the current version and the latest version
+        Get version number
 
         Returns:
-            bool: True = latest, False = outdated
-                  Returns False if the latest version info cannot be retrieved
+            str: Version number or "unknown" if not available
         """
-        current_version = Version.get_current_version()
-        latest_version = Version.get_latest_version()
+        return self._raw_data.get("version", "unknown")
 
-        # Compare only if both versions can be retrieved
-        return current_version == latest_version if latest_version else False
+    def get_released_at(self) -> str:
+        """
+        Get release date
+
+        Returns:
+            str: Release date or "unknown" if not available
+        """
+        return self._raw_data.get("released_at", "unknown")
+
+    def get_release_note(self) -> str:
+        """
+        Get release notes
+
+        Returns:
+            str: Release notes in Markdown format or "No release notes available" if not available
+        """
+        return self._raw_data.get("release_notes", "No release notes available")
+
+    def get_release_url(self) -> str:
+        """
+        Get API URL for this release
+
+        Returns:
+            str: API URL or "unknown" if not available
+        """
+        return self._api_url if self._api_url else "unknown"
+
+
+def get_installed_version() -> str:
+    """
+    Get the current installed application version number
+
+    Returns:
+        str: Version number string or "unknown" if not available
+    """
+    try:
+        version_path = safe_resource_path("app/resources/version")
+        if version_path and os.path.exists(version_path):
+            with open(version_path, "r") as f:
+                return f.read().strip()
+        else:
+            raise FileNotFoundError("Version file not found")
+    except Exception as e:
+        logger.error(f"Error getting installed version: {e}")
+        return "unknown"
+
+
+def get_latest_version() -> str:
+    """
+    Get the latest version number from API
+
+    Returns:
+        str: Latest version number or "unknown" if retrieval fails
+    """
+    try:
+        res = requests.get(VERSION_INFO_URL + "latest/version", timeout=DEFAULT_TIMEOUT)
+        res.raise_for_status()
+        return res.text.strip()
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Network error while fetching latest version: {e}")
+        return "unknown"
+    except Exception as e:
+        logger.error(f"Error while fetching latest version: {e}")
+        return "unknown"
+
+
+def get_installed_release() -> Release:
+    """
+    Get Release object for the currently installed version
+
+    Returns:
+        Release: Release object for installed version
+    """
+    version = get_installed_version()
+    return Release(version)
+
+
+def get_release(version: str) -> Release:
+    """
+    Get Release object for specified version
+
+    Args:
+        version (str): Version string
+
+    Returns:
+        Release: Release object for specified version
+    """
+    return Release(version)
+
+
+def fetch_release_info(version: str) -> None:
+    """
+    Fetch and cache release information for specified version
+
+    Args:
+        version (str): Version string to fetch
+    """
+    release = Release(version)
+    # Release object automatically fetches and caches the data during initialization
