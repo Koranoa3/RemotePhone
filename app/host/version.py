@@ -33,7 +33,7 @@ def safe_resource_path(relative_path: str) -> str:
     try:
         path = resource_path(relative_path)
         if not os.path.exists(path):
-            raise FileNotFoundError(f"Resource not found: {path}")
+            logger.warning(f"Resource not found: {path}")
         return path
     except Exception as e:
         logger.error(f"Error resolving resource path for {relative_path}: {e}")
@@ -101,9 +101,14 @@ class Release:
             cache_data = {}
             if self.json_path and os.path.exists(self.json_path):
                 with open(self.json_path, "r", encoding="utf-8") as f:
-                    cache_data = json.load(f)
+                    try:
+                        cache_data = json.load(f)
+                    except json.JSONDecodeError:
+                        logger.warning("Cache file is corrupted, starting fresh")
+                        cache_data = {}
             
             cache_data[self._version] = self._raw_data
+            logger.debug(f"Caching release info for version {self._version} - {self._raw_data}")
             
             # Ensure directory exists
             if self.json_path:
@@ -198,7 +203,8 @@ def get_latest_version() -> str:
     try:
         res = requests.get(VERSION_INFO_URL + "latest/version", timeout=DEFAULT_TIMEOUT)
         res.raise_for_status()
-        return res.text.strip()
+        data = res.json()
+        return data.get("version", "unknown")
     except requests.exceptions.RequestException as e:
         logger.error(f"Network error while fetching latest version: {e}")
         return "unknown"

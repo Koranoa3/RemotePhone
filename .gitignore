@@ -10,5 +10,4 @@ dist/
 build.txt
 RemotePhoneHost.spec
 RemotePhoneLauncher.spec
-app/resources/latest_release.json
-app/resources/current_release.json
+app/resources/releases_info.json
