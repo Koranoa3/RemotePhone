@@ -1,5 +1,5 @@
 from app.host import host_config
-from app.common import Version
+from app.host import version
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -73,28 +73,29 @@ class SettingsApi:
 
 class ReleaseApi:
     def get_current_application_version(self):
-        return {"version": Version.get_current_version()}
+        return {"version": version.get_installed_version()}
 
     def get_current_version_info(self):
-
-        current_json = Version.get_current()
+        current_release = version.get_installed_release()
         return {
-            "version": current_json.get("version"),
-            "released_at": current_json.get("released_at"),
-            "release_notes": current_json.get("release_notes")
+            "version": current_release.get_version(),
+            "released_at": current_release.get_released_at(),
+            "release_notes": current_release.get_release_note()
         }
 
     def check_for_updates(self):
-        
-        if Version.is_latest():
+        current_release = version.get_installed_release()
+        logger.debug(f"Current release: {current_release.get_version()}")
+        if current_release.is_latest():
             return {"update_available": False}
 
-        latest_json = Version.get_latest()
+        latest_version = version.get_latest_version()
+        latest_release = version.get_release(latest_version)
         return {
             "update_available": True,
-            "version": latest_json.get("version"),
-            "released_at": latest_json.get("released_at"),
-            "release_notes": latest_json.get("release_notes")
+            "version": latest_release.get_version(),
+            "released_at": latest_release.get_released_at(),
+            "release_notes": latest_release.get_release_note()
         }
     
     def update_now(self):
