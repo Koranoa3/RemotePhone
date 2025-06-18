@@ -31,7 +31,7 @@
                 }
             },
             {
-                "label": "▲",
+                "label": "\u25b2",
                 "type": "action",
                 "command": "up",
                 "position": {
@@ -44,7 +44,7 @@
                 }
             },
             {
-                "label": "▼",
+                "label": "\u25bc",
                 "type": "action",
                 "command": "down",
                 "position": {
@@ -57,7 +57,7 @@
                 }
             },
             {
-                "label": "◀",
+                "label": "\u25c0",
                 "type": "action",
                 "command": "left",
                 "position": {
@@ -70,7 +70,7 @@
                 }
             },
             {
-                "label": "▶",
+                "label": "\u25b6",
                 "type": "action",
                 "command": "right",
                 "position": {
@@ -130,7 +130,10 @@
                     "type": "action",
                     "positive": "next_virtual_desktop",
                     "negative": "prev_virtual_desktop",
-                    "tap": ["win", "tab"]
+                    "tap": [
+                        "win",
+                        "tab"
+                    ]
                 },
                 "threshold": 60,
                 "horizontal": true,
@@ -146,7 +149,10 @@
             {
                 "label": "Task View",
                 "type": "action",
-                "command": ["win", "tab"],
+                "command": [
+                    "win",
+                    "tab"
+                ],
                 "position": {
                     "x": 3,
                     "y": 1
@@ -161,8 +167,15 @@
                 "type": "slideaction",
                 "command": {
                     "type": "action",
-                    "positive": ["ctrl", "tab"],
-                    "negative": ["shift", "ctrl", "tab"]
+                    "positive": [
+                        "ctrl",
+                        "tab"
+                    ],
+                    "negative": [
+                        "shift",
+                        "ctrl",
+                        "tab"
+                    ]
                 },
                 "threshold": 30,
                 "horizontal": true,
@@ -178,7 +191,10 @@
             {
                 "label": "Back",
                 "type": "action",
-                "command": ["alt", "left"],
+                "command": [
+                    "alt",
+                    "left"
+                ],
                 "position": {
                     "x": 1,
                     "y": 4
@@ -191,7 +207,10 @@
             {
                 "label": "Forward",
                 "type": "action",
-                "command": ["alt", "right"],
+                "command": [
+                    "alt",
+                    "right"
+                ],
                 "position": {
                     "x": 3,
                     "y": 4
@@ -215,5 +234,6 @@
                 }
             }
         ]
-    ]
+    ],
+    "prefered_layout_mode": "container trackpad"
 }

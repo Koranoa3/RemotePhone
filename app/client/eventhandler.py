@@ -6,6 +6,7 @@ from logging import getLogger
 logger = getLogger(__name__)
 
 from app.host.notifer import notify
+from app.config_io import set_client_attribute
 
 HEARTBEAT_INTERVAL = 3  # seconds
 HEARTBEAT_TIMEOUT = 6  # disconnect if pong is not received within this time
@@ -85,6 +86,9 @@ async def handle_client(websocket):
                             config_data = json.load(f)
                         await websocket.send(json.dumps({"type": "config", "config": config_data}))
 
+                    elif msg_type == "prefered_layout_mode":
+                        layout_mode = data.get("layout_mode")
+                        set_client_attribute("prefered_layout_mode", layout_mode)
                     else:
                         logger.info(f"Message with unrecognized type: {data}")
                 except Exception as e:
