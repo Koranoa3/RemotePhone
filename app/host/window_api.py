@@ -1,3 +1,4 @@
+from app.client.authenticator import get_current_passkey
 from app.host import host_config
 from app.host import version
 
@@ -38,10 +39,10 @@ class HomeApi:
 
 class ConnectApi:
     def get_current_passkey(self):
-        # 仮実装
+        passkey = get_current_passkey()
         return {
-            "passkey": "1234",
-            "remain": 25
+            "passkey": passkey["key"],
+            "remain": passkey["expire_in"]
         }
 
     def get_registered_devices(self):
