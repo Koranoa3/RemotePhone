@@ -20,24 +20,6 @@ from app.common import resource_path
 from logging import getLogger
 logger = getLogger(__name__)
 
-def safe_resource_path(relative_path: str) -> str:
-    """
-    Wrapper for resource_path to handle edge cases like missing files or incorrect paths.
-
-    Args:
-        relative_path (str): The relative path to the resource.
-
-    Returns:
-        str: The absolute path to the resource, or None if the path is invalid.
-    """
-    try:
-        path = resource_path(relative_path)
-        if not os.path.exists(path):
-            logger.warning(f"Resource not found: {path}")
-        return path
-    except Exception as e:
-        logger.error(f"Error resolving resource path for {relative_path}: {e}")
-        return None
 
 # Base URL for the server API
 VERSION_INFO_URL = "http://skyboxx.tplinkdns.com:8000/api/releases/"
@@ -59,7 +41,7 @@ class Release:
         Args:
             version (str): Version string
         """
-        self.json_path = safe_resource_path(".cache/releases_info.json")
+        self.json_path = resource_path(".cache/releases_info.json")
         self._api_url = VERSION_INFO_URL + version
         self._raw_data = {}
         self._version = version
@@ -182,7 +164,7 @@ def get_installed_version() -> str:
         str: Version number string or "unknown" if not available
     """
     try:
-        version_path = safe_resource_path("app/resources/version")
+        version_path = resource_path("app/resources/version")
         if version_path and os.path.exists(version_path):
             with open(version_path, "r") as f:
                 return f.read().strip()
