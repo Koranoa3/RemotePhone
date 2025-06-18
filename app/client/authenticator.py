@@ -7,6 +7,28 @@ logger = getLogger(__name__)
 from app.host.notifer import notify
 
 registered_uuids_path = "registered_uuids.txt"
+
+# --- Current Passkey Management ---
+KEY_EXPIRE = 60  # seconds
+_current_key = None
+_key_limit = None
+
+def get_current_passkey() -> dict:
+    global _current_key, _key_limit
+    
+    current_time = int(time.time())
+    
+    # Check if key exists and is still valid
+    if _current_key and _key_limit and current_time < _key_limit:
+        expire_in = _key_limit - current_time
+        return {"key": _current_key, "expire_in": expire_in}
+    
+    # Generate new key using onetime_passkey with uuid=None
+    _current_key = onetime_passkey(timestamp=current_time)
+    _key_limit = current_time + KEY_EXPIRE
+    
+    return {"key": _current_key, "expire_in": KEY_EXPIRE}
+
 # --- Registered UUID ---
 def if_uuid_registered(uuid: str) -> bool:
     if not os.path.exists(registered_uuids_path):
@@ -23,10 +45,10 @@ def register_uuid(uuid: str) -> bool:
     return True
 
 # --- OTP Generation ---
-def onetime_passkey(uuid: str, timestamp: int = None) -> str:
+def onetime_passkey(timestamp: int = None) -> str:
     if timestamp is None:
         timestamp = int(time.time())
-    hash_object = hashlib.sha256(f"{uuid}{timestamp}".encode())
+    hash_object = hashlib.sha256(f"passkey{timestamp}".encode())
     otp = int(hash_object.hexdigest(), 16) % 10000
     return f"{otp:04d}"
 
@@ -35,12 +57,12 @@ def onetime_passkey(uuid: str, timestamp: int = None) -> str:
 class AuthSession:
     def __init__(self, uuid: str):
         self.uuid = uuid
-        self.passkey = onetime_passkey(uuid)
-        self.timestamp = int(time.time())
         self.attempt = 1
 
     def is_expired(self):
-        return (int(time.time()) - self.timestamp) > 60
+        global _key_limit
+        current_time = int(time.time())
+        return not (_key_limit and current_time < _key_limit)
 
 
 # --- Authentication Process ---
@@ -54,26 +76,27 @@ async def on_auth_start(ws, uuid: str):
         return
     
     ws.auth = AuthSession(uuid=uuid)
-    logger.info(f"Authentication OTP: {ws.auth.passkey}")
-    notify(f"Authentication request received from client.\nOne-time key: {ws.auth.passkey}", duration=10, title="Authentication Request")
+    passkey_info = get_current_passkey()
+    passkey = passkey_info["key"]
+    logger.info(f"Authentication OTP: {passkey}")
+    notify(f"Authentication request received from client.\nOne-time key: {passkey}", duration=10, title="Authentication Request")
     await ws.send(json.dumps({"type": "auth_needed", "message": "Please enter the one-time key issued by the host."}))
 
-async def send_auth_needed(ws, message: str, regenerate: bool = True):
+async def send_auth_needed(ws, message: str):
     if not hasattr(ws, "auth"):
         logger.info("No authentication session found.")
         return
 
-    if regenerate:
-        ws.auth.passkey = onetime_passkey(ws.auth.uuid)
-        ws.auth.timestamp = int(time.time())
-        logger.info(f"Authentication OTP reissued: {ws.auth.passkey}")
-        notify(f"Authentication request received again from client.\nOne-time key: {ws.auth.passkey}", duration=10, title="Authentication Request")
+    passkey_info = get_current_passkey()
+    passkey = passkey_info["key"]
+    ws.auth.timestamp = int(time.time())
+    logger.info(f"Authentication OTP reissued: {passkey}")
+    notify(f"Authentication request received again from client.\nOne-time key: {passkey}", duration=10, title="Authentication Request")
 
     await ws.send(json.dumps({
         "type": "auth_needed",
         "message": message
     }))
-
 
 async def handle_auth_response(ws, onetime: str):
     result = check_response(ws, onetime)
@@ -97,7 +120,7 @@ async def handle_auth_response(ws, onetime: str):
         await ws.close(code=4003)
         return False
 
-    await send_auth_needed(ws, f"{reason}. Please try again.", regenerate=True)
+    await send_auth_needed(ws, f"{reason}. Please try again.")
     return False
 
 def check_response(ws, onetime: str) -> dict:
@@ -117,7 +140,11 @@ def check_response(ws, onetime: str) -> dict:
             "reason": "Passkey has expired",
             "allow_retry": True
         }
-    if onetime != session.passkey:
+    
+    passkey_info = get_current_passkey()
+    current_passkey = passkey_info["key"]
+    
+    if onetime != current_passkey:
         if session.attempt > 9:
             return {
                 "type": "auth_result",
