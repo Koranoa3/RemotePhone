@@ -9,25 +9,25 @@ from app.host.notifer import notify
 registered_uuids_path = "registered_uuids.txt"
 
 # --- Current Passkey Management ---
-KEY_EXPIRE = 60  # seconds
+KEY_EXPIRE = 30  # seconds
 _current_key = None
 _key_limit = None
 
 def get_current_passkey() -> dict:
     global _current_key, _key_limit
     
-    current_time = int(time.time())
-    
+    timestamp = int(time.time())
     # Check if key exists and is still valid
-    if _current_key and _key_limit and current_time < _key_limit:
-        expire_in = _key_limit - current_time
+    if _current_key and _key_limit and timestamp < _key_limit:
+        expire_in = KEY_EXPIRE - (timestamp % KEY_EXPIRE)
         return {"key": _current_key, "expire_in": expire_in}
-    
+
     # Generate new key using onetime_passkey with uuid=None
-    _current_key = onetime_passkey(timestamp=current_time)
-    _key_limit = current_time + KEY_EXPIRE
-    
-    return {"key": _current_key, "expire_in": KEY_EXPIRE}
+    _current_key = onetime_passkey(timestamp=timestamp)
+    _key_limit = timestamp + KEY_EXPIRE - (timestamp % KEY_EXPIRE)
+
+    expire_in = KEY_EXPIRE - (timestamp % KEY_EXPIRE)
+    return {"key": _current_key, "expire_in": expire_in}
 
 # --- Registered UUID ---
 def if_uuid_registered(uuid: str) -> bool:
@@ -48,7 +48,13 @@ def register_uuid(uuid: str) -> bool:
 def onetime_passkey(timestamp: int = None) -> str:
     if timestamp is None:
         timestamp = int(time.time())
-    hash_object = hashlib.sha256(f"passkey{timestamp}".encode())
+    # デバイス名を取得
+    device_name = os.uname().nodename if hasattr(os, "uname") else os.getenv("COMPUTERNAME", "unknown")
+    user_name = os.getenv("USERNAME", "unknown")
+    # KEY_EXPIREで区切った現在時刻
+    time_block = int(timestamp // KEY_EXPIRE)
+    hash_input = f"onetime{device_name}{user_name}{time_block}"
+    hash_object = hashlib.sha256(hash_input.encode())
     otp = int(hash_object.hexdigest(), 16) % 10000
     return f"{otp:04d}"
 
