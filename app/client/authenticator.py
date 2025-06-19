@@ -5,6 +5,7 @@ from logging import getLogger
 logger = getLogger(__name__)
 
 from app.host.notifer import notify
+from app.common import get_device_id
 
 registered_uuids_path = "registered_uuids.txt"
 
@@ -12,6 +13,9 @@ registered_uuids_path = "registered_uuids.txt"
 KEY_EXPIRE = 30  # seconds
 _current_key = None
 _key_limit = None
+_host_device_info: dict = {} # ハッシュ値を生成するためのデバイス情報
+
+KEY_ATTEMPT_LIMIT = 9
 
 def get_current_passkey() -> dict:
     global _current_key, _key_limit
@@ -46,14 +50,34 @@ def register_uuid(uuid: str) -> bool:
 
 # --- OTP Generation ---
 def onetime_passkey(timestamp: int = None) -> str:
+    global _host_device_info
+    if not _host_device_info:
+        # デバイス情報を初期化
+        try:
+            _host_device_info = {
+                "device_name": os.uname().nodename if hasattr(os, "uname") else os.getenv("COMPUTERNAME", "unknown"),
+                "user_name": os.getenv("USERNAME", "unknown"),
+                "device_id": get_device_id()
+            }
+        except Exception:
+            logger.warning("Failed to retrieve host device information, using default values.")
+            _host_device_info = {
+                "device_name": "unknown",
+                "user_name": "unknown",
+                "device_id": "unknown"
+            }
+
+    # デバイス名を取得
+    device_name = _host_device_info.get("device_name", "unknown")
+    user_name = _host_device_info.get("user_name", "unknown")
+    device_id = _host_device_info.get("device_id", "unknown")
+
     if timestamp is None:
         timestamp = int(time.time())
-    # デバイス名を取得
-    device_name = os.uname().nodename if hasattr(os, "uname") else os.getenv("COMPUTERNAME", "unknown")
-    user_name = os.getenv("USERNAME", "unknown")
+
     # KEY_EXPIREで区切った現在時刻
     time_block = int(timestamp // KEY_EXPIRE)
-    hash_input = f"onetime{device_name}{user_name}{time_block}"
+    hash_input = f"onetime{device_name}{user_name}{device_id}{time_block}"
     hash_object = hashlib.sha256(hash_input.encode())
     otp = int(hash_object.hexdigest(), 16) % 10000
     return f"{otp:04d}"
@@ -151,7 +175,7 @@ def check_response(ws, onetime: str) -> dict:
     current_passkey = passkey_info["key"]
     
     if onetime != current_passkey:
-        if session.attempt > 9:
+        if session.attempt > KEY_ATTEMPT_LIMIT:
             return {
                 "type": "auth_result",
                 "status": "fail",
