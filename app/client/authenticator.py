@@ -5,8 +5,34 @@ from logging import getLogger
 logger = getLogger(__name__)
 
 from app.host.notifer import notify
+from app.common import get_device_id
 
 registered_uuids_path = "registered_uuids.txt"
+
+# --- Current Passkey Management ---
+KEY_EXPIRE = 30  # seconds
+_current_key = None
+_key_limit = None
+_host_device_info: dict = {} # ハッシュ値を生成するためのデバイス情報
+
+KEY_ATTEMPT_LIMIT = 9
+
+def get_current_passkey() -> dict:
+    global _current_key, _key_limit
+    
+    timestamp = int(time.time())
+    # Check if key exists and is still valid
+    if _current_key and _key_limit and timestamp < _key_limit:
+        expire_in = KEY_EXPIRE - (timestamp % KEY_EXPIRE)
+        return {"key": _current_key, "expire_in": expire_in}
+
+    # Generate new key using onetime_passkey with uuid=None
+    _current_key = onetime_passkey(timestamp=timestamp)
+    _key_limit = timestamp + KEY_EXPIRE - (timestamp % KEY_EXPIRE)
+
+    expire_in = KEY_EXPIRE - (timestamp % KEY_EXPIRE)
+    return {"key": _current_key, "expire_in": expire_in}
+
 # --- Registered UUID ---
 def if_uuid_registered(uuid: str) -> bool:
     if not os.path.exists(registered_uuids_path):
@@ -23,10 +49,36 @@ def register_uuid(uuid: str) -> bool:
     return True
 
 # --- OTP Generation ---
-def onetime_passkey(uuid: str, timestamp: int = None) -> str:
+def onetime_passkey(timestamp: int = None) -> str:
+    global _host_device_info
+    if not _host_device_info:
+        # デバイス情報を初期化
+        try:
+            _host_device_info = {
+                "device_name": os.uname().nodename if hasattr(os, "uname") else os.getenv("COMPUTERNAME", "unknown"),
+                "user_name": os.getenv("USERNAME", "unknown"),
+                "device_id": get_device_id()
+            }
+        except Exception:
+            logger.warning("Failed to retrieve host device information, using default values.")
+            _host_device_info = {
+                "device_name": "unknown",
+                "user_name": "unknown",
+                "device_id": "unknown"
+            }
+
+    # デバイス名を取得
+    device_name = _host_device_info.get("device_name", "unknown")
+    user_name = _host_device_info.get("user_name", "unknown")
+    device_id = _host_device_info.get("device_id", "unknown")
+
     if timestamp is None:
         timestamp = int(time.time())
-    hash_object = hashlib.sha256(f"{uuid}{timestamp}".encode())
+
+    # KEY_EXPIREで区切った現在時刻
+    time_block = int(timestamp // KEY_EXPIRE)
+    hash_input = f"onetime{device_name}{user_name}{device_id}{time_block}"
+    hash_object = hashlib.sha256(hash_input.encode())
     otp = int(hash_object.hexdigest(), 16) % 10000
     return f"{otp:04d}"
 
@@ -35,12 +87,12 @@ def onetime_passkey(uuid: str, timestamp: int = None) -> str:
 class AuthSession:
     def __init__(self, uuid: str):
         self.uuid = uuid
-        self.passkey = onetime_passkey(uuid)
-        self.timestamp = int(time.time())
         self.attempt = 1
 
     def is_expired(self):
-        return (int(time.time()) - self.timestamp) > 60
+        global _key_limit
+        current_time = int(time.time())
+        return not (_key_limit and current_time < _key_limit)
 
 
 # --- Authentication Process ---
@@ -54,26 +106,27 @@ async def on_auth_start(ws, uuid: str):
         return
     
     ws.auth = AuthSession(uuid=uuid)
-    logger.info(f"Authentication OTP: {ws.auth.passkey}")
-    notify(f"Authentication request received from client.\nOne-time key: {ws.auth.passkey}", duration=10, title="Authentication Request")
+    passkey_info = get_current_passkey()
+    passkey = passkey_info["key"]
+    logger.info(f"Authentication OTP: {passkey}")
+    notify(f"Authentication request received from client.\nOne-time key: {passkey}", duration=10, title="Authentication Request")
     await ws.send(json.dumps({"type": "auth_needed", "message": "Please enter the one-time key issued by the host."}))
 
-async def send_auth_needed(ws, message: str, regenerate: bool = True):
+async def send_auth_needed(ws, message: str):
     if not hasattr(ws, "auth"):
         logger.info("No authentication session found.")
         return
 
-    if regenerate:
-        ws.auth.passkey = onetime_passkey(ws.auth.uuid)
-        ws.auth.timestamp = int(time.time())
-        logger.info(f"Authentication OTP reissued: {ws.auth.passkey}")
-        notify(f"Authentication request received again from client.\nOne-time key: {ws.auth.passkey}", duration=10, title="Authentication Request")
+    passkey_info = get_current_passkey()
+    passkey = passkey_info["key"]
+    ws.auth.timestamp = int(time.time())
+    logger.info(f"Authentication OTP reissued: {passkey}")
+    notify(f"Authentication request received again from client.\nOne-time key: {passkey}", duration=10, title="Authentication Request")
 
     await ws.send(json.dumps({
         "type": "auth_needed",
         "message": message
     }))
-
 
 async def handle_auth_response(ws, onetime: str):
     result = check_response(ws, onetime)
@@ -97,7 +150,7 @@ async def handle_auth_response(ws, onetime: str):
         await ws.close(code=4003)
         return False
 
-    await send_auth_needed(ws, f"{reason}. Please try again.", regenerate=True)
+    await send_auth_needed(ws, f"{reason}. Please try again.")
     return False
 
 def check_response(ws, onetime: str) -> dict:
@@ -117,8 +170,12 @@ def check_response(ws, onetime: str) -> dict:
             "reason": "Passkey has expired",
             "allow_retry": True
         }
-    if onetime != session.passkey:
-        if session.attempt > 9:
+    
+    passkey_info = get_current_passkey()
+    current_passkey = passkey_info["key"]
+    
+    if onetime != current_passkey:
+        if session.attempt > KEY_ATTEMPT_LIMIT:
             return {
                 "type": "auth_result",
                 "status": "fail",

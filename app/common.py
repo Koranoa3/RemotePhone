@@ -1,4 +1,5 @@
 import os, sys
+import winreg
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -22,3 +23,16 @@ def resource_path(relative_path: str) -> str:
     except Exception as e:
         logger.error(f"Error resolving resource path for {relative_path}: {e}")
         return None
+
+# PCのデバイスID（Windows: MachineGuid）を取得
+def get_device_id():
+    if os.name == "nt": # Windows
+        try:
+            reg = winreg.ConnectRegistry(None, winreg.HKEY_LOCAL_MACHINE)
+            key = winreg.OpenKey(reg, r"SOFTWARE\Microsoft\Cryptography")
+            value, _ = winreg.QueryValueEx(key, "MachineGuid")
+            return value
+        except Exception:
+            return "unknown"
+    else:
+        return "unknown"
