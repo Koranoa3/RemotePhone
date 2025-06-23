@@ -7,7 +7,7 @@ logger = getLogger(__name__)
 from app.host.notifer import notify
 from app.common import get_device_id
 
-from app.client.clients_manager import if_uuid_registered, register_uuid
+from app.client.clients_manager import if_uuid_registered, register_uuid, update_last_connection
 
 # --- Current Passkey Management ---
 KEY_EXPIRE = 30  # seconds
@@ -88,6 +88,8 @@ async def on_auth_start(ws, uuid: str):
         logger.info("Authentication successful: UUID is already registered.")
         notify("Client has connected.")
         ws.authenticated = True
+        ws.uuid = uuid
+        update_last_connection(uuid)
         await ws.send(json.dumps({"type": "auth_result", "status": "ok"}))
         return
     
