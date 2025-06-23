@@ -81,7 +81,9 @@ window.addEventListener('pywebviewready', async function () {
         list.forEach(dev => {
             // dev.last_connectionは分単位の経過時間と仮定
             let statusText = '';
-            if (dev.last_connection === 0) {
+            if (dev.last_connection === -1) {
+                statusText = '未接続';
+            } else if (dev.last_connection === 0) {
                 statusText = '接続中';
             } else if (dev.last_connection < 60) {
                 statusText = `${dev.last_connection}分前に接続`;

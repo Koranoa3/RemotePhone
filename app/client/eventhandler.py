@@ -61,7 +61,7 @@ async def handle_client(websocket):
                         now = int(time.time() * 1000)
                         rtt = now - data["timestamp"]
                         last_pong = time.time()
-                        update_last_connection(websocket.uuid)
+                        update_last_connection(websocket.uuid) # TODO: 接続状態の更新方法を改善
                         await websocket.send(json.dumps({"type": "rtt", "rtt": rtt}))
 
                     elif msg_type.startswith("tp_"):
