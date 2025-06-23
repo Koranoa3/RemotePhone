@@ -6,8 +6,10 @@ logger = getLogger(__name__)
 
 from app.host.notifer import notify
 from app.common import get_device_id
+from app.common import resource_path
 
-registered_uuids_path = "registered_uuids.txt"
+old_registered_uuids_path = "registered_uuids.txt"
+registered_uuids_path = "registered_uuids.json"
 
 # --- Current Passkey Management ---
 KEY_EXPIRE = 30  # seconds
@@ -33,19 +35,61 @@ def get_current_passkey() -> dict:
     expire_in = KEY_EXPIRE - (timestamp % KEY_EXPIRE)
     return {"key": _current_key, "expire_in": expire_in}
 
-# --- Registered UUID ---
-def if_uuid_registered(uuid: str) -> bool:
-    if not os.path.exists(registered_uuids_path):
-        open(registered_uuids_path, "w").close()
-    with open(registered_uuids_path, "r+") as f:
-        registered_uuids = f.read().splitlines()
-    return uuid in registered_uuids
+def migrate_registered_uuids():
+    json_path = resource_path(registered_uuids_path)
+    txt_path = resource_path(old_registered_uuids_path)
+    if not os.path.exists(json_path) and os.path.exists(txt_path):
+        uuids = {}
+        with open(txt_path, "r") as f:
+            for line in f:
+                uuid = line.strip()
+                if uuid:
+                    uuids[uuid] = {}
+        with open(json_path, "w") as f:
+            json.dump(uuids, f, indent=2)
+        os.remove(txt_path)
+        logger.info(f"Migrated registered UUIDs from {txt_path} to {json_path}")
 
-def register_uuid(uuid: str) -> bool:
-    if if_uuid_registered(uuid):
+def load_registered_uuids() -> dict:
+    migrate_registered_uuids()
+    path = resource_path(registered_uuids_path)
+    if not os.path.exists(path):
+        with open(path, "w") as f:
+            json.dump({}, f)
+        logger.info(f"Created new registered_uuids.json at {path}")
+        return {}
+    with open(path, "r") as f:
+        try:
+            data = json.load(f)
+            logger.debug(f"Loaded registered UUIDs from {path}")
+            return data
+        except Exception:
+            logger.error("Failed to load registered_uuids.json, resetting file.")
+            return {}
+
+def save_registered_uuids(data: dict):
+    path = resource_path(registered_uuids_path)
+    with open(path, "w") as f:
+        json.dump(data, f, indent=2)
+    logger.debug(f"Saved registered UUIDs to {path}")
+
+def if_uuid_registered(uuid: str) -> bool:
+    uuids = load_registered_uuids()
+    exists = uuid in uuids
+    logger.debug(f"Checked if UUID {uuid} is registered: {exists}")
+    return exists
+
+def register_uuid(uuid: str, timestamp=None) -> bool:
+    uuids = load_registered_uuids()
+    if uuid in uuids:
+        logger.info(f"UUID {uuid} is already registered.")
         return False
-    with open(registered_uuids_path, "a+") as f:
-        f.write(uuid + "\n")
+    entry = {}
+    if timestamp is not None:
+        entry["last_connection"] = timestamp
+    uuids[uuid] = entry
+    save_registered_uuids(uuids)
+    logger.info(f"Registered new UUID: {uuid}")
     return True
 
 # --- OTP Generation ---
