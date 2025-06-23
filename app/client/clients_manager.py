@@ -95,3 +95,21 @@ def update_last_connection(uuid: str, timestamp=None):
     uuids[uuid]["last_connection"] = timestamp
     save_registered_uuids(uuids)
     logger.info(f"Updated last connection for UUID {uuid} to {timestamp}")
+
+def unregister_uuid(uuid: str) -> bool:
+    """
+    Unregisters a UUID.
+
+    ## Inputs:
+        uuid (str): The UUID to unregister.
+    ## Returns:
+        bool: True if the UUID was successfully unregistered, False if it was not found.
+    """
+    uuids = load_registered_uuids()
+    if uuid not in uuids:
+        logger.info(f"UUID {uuid} is not registered, cannot unregister.")
+        return False
+    del uuids[uuid]
+    save_registered_uuids(uuids)
+    logger.info(f"Unregistered UUID: {uuid}")
+    return True
