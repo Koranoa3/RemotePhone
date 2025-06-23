@@ -77,3 +77,21 @@ def register_uuid(uuid: str, timestamp=None) -> bool:
     save_registered_uuids(uuids)
     logger.info(f"Registered new UUID: {uuid}")
     return True
+
+def update_last_connection(uuid: str, timestamp=None):
+    """
+    Updates the last connection timestamp for a registered UUID.
+
+    ## Inputs:
+        uuid (str): The UUID to update.
+        timestamp (datetime, optional): The new timestamp. If None, current time is used.
+    """
+    uuids = load_registered_uuids()
+    if uuid not in uuids:
+        logger.warning(f"UUID {uuid} is not registered, cannot update last connection.")
+        return
+    if timestamp is None:
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    uuids[uuid]["last_connection"] = timestamp
+    save_registered_uuids(uuids)
+    logger.info(f"Updated last connection for UUID {uuid} to {timestamp}")
