@@ -78,27 +78,33 @@ window.addEventListener('pywebviewready', async function () {
         const list = await pywebview.api.connect.get_registered_devices();
         const container = document.querySelector('.device-list');
         container.innerHTML = '';
-        list.forEach(dev => {
+        
+        const sortedList = [...list].sort((a, b) => {
+            if (a.last_connection === -1 && b.last_connection !== -1) return 1;
+            if (a.last_connection !== -1 && b.last_connection === -1) return -1;
+            return a.last_connection - b.last_connection;
+        });
+        sortedList.forEach(dev => {
             // dev.last_connectionは分単位の経過時間と仮定
             let statusText = '';
             if (dev.last_connection === -1) {
-                statusText = '未接続';
+                statusText = '最後の接続：不明';
             } else if (dev.last_connection === 0) {
-                statusText = '接続中';
+                statusText = 'オンライン';
             } else if (dev.last_connection < 60) {
-                statusText = `${dev.last_connection}分前に接続`;
+                statusText = `最後の接続：${dev.last_connection}分前`;
             } else if (dev.last_connection < 60 * 24) {
                 const hours = Math.floor(dev.last_connection / 60);
-                statusText = `${hours}時間前に接続`;
+                statusText = `最後の接続：${hours}時間前`;
             } else if (dev.last_connection < 60 * 24 * 7) {
                 const days = Math.floor(dev.last_connection / (60 * 24));
-                statusText = `${days}日前に接続`;
+                statusText = `最後の接続：${days}日前`;
             } else if (dev.last_connection < 60 * 24 * 30) {
                 const weeks = Math.floor(dev.last_connection / (60 * 24 * 7));
-                statusText = `${weeks}週間前に接続`;
+                statusText = `最後の接続：${weeks}週間前`;
             } else {
                 const months = Math.floor(dev.last_connection / (60 * 24 * 30));
-                statusText = `${months}ヶ月前に接続`;
+                statusText = `最後の接続：${months}ヶ月前`;
             }
 
             const el = document.createElement('div');

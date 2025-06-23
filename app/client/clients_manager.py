@@ -7,46 +7,44 @@ from app.common import resource_path
 from logging import getLogger
 logger = getLogger(__name__)
 
-old_registered_uuids_path = "registered_uuids.txt"
-registered_uuids_path = "registered_uuids.json"
+old_registered_uuids_filename = "registered_uuids.txt"
+registered_uuids_filename = "registered_uuids.json"
+old_uuids_path = resource_path(old_registered_uuids_filename)
+uuids_path = resource_path(registered_uuids_filename)
 
 def migrate_registered_uuids():
-    json_path = resource_path(registered_uuids_path)
-    txt_path = resource_path(old_registered_uuids_path)
-    if not os.path.exists(json_path) and os.path.exists(txt_path):
+    if not os.path.exists(uuids_path) and os.path.exists(old_uuids_path):
         uuids = {}
-        with open(txt_path, "r") as f:
+        with open(old_uuids_path, "r") as f:
             for line in f:
                 uuid = line.strip()
                 if uuid:
                     uuids[uuid] = {}
-        with open(json_path, "w") as f:
+        with open(uuids_path, "w") as f:
             json.dump(uuids, f, indent=2)
-        os.remove(txt_path)
-        logger.info(f"Migrated registered UUIDs from {txt_path} to {json_path}")
+        os.remove(old_uuids_path)
+        logger.info(f"Migrated registered UUIDs from {old_uuids_path} to {uuids_path}")
 
 def load_registered_uuids() -> dict:
     migrate_registered_uuids()
-    path = resource_path(registered_uuids_path)
-    if not os.path.exists(path):
-        with open(path, "w") as f:
+    if not os.path.exists(uuids_path):
+        with open(uuids_path, "w") as f:
             json.dump({}, f)
-        logger.info(f"Created new registered_uuids.json at {path}")
+        logger.info(f"Created new registered_uuids.json at {uuids_path}")
         return {}
-    with open(path, "r") as f:
+    with open(uuids_path, "r") as f:
         try:
             data = json.load(f)
-            logger.debug(f"Loaded registered UUIDs from {path}")
+            logger.debug(f"Loaded registered UUIDs from {uuids_path}")
             return data
         except Exception:
             logger.error("Failed to load registered_uuids.json, resetting file.")
             return {}
 
 def save_registered_uuids(data: dict):
-    path = resource_path(registered_uuids_path)
-    with open(path, "w") as f:
+    with open(uuids_path, "w") as f:
         json.dump(data, f, indent=2)
-    logger.debug(f"Saved registered UUIDs to {path}")
+    logger.debug(f"Saved registered UUIDs to {uuids_path}")
 
 def if_uuid_registered(uuid: str) -> bool:
     uuids = load_registered_uuids()
@@ -94,7 +92,7 @@ def update_last_connection(uuid: str, timestamp=None):
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     uuids[uuid]["last_connection"] = timestamp
     save_registered_uuids(uuids)
-    logger.info(f"Updated last connection for UUID {uuid} to {timestamp}")
+    logger.debug(f"Updated last connection for UUID {uuid} to {timestamp}")
 
 def unregister_uuid(uuid: str) -> bool:
     """

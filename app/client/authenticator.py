@@ -84,11 +84,11 @@ class AuthSession:
 # --- Authentication Process ---
 async def on_auth_start(ws, uuid: str):
     logger.info(f"Authentication started: {uuid}")
+    ws.uuid = uuid
     if if_uuid_registered(uuid):
         logger.info("Authentication successful: UUID is already registered.")
         notify("Client has connected.")
         ws.authenticated = True
-        ws.uuid = uuid
         update_last_connection(uuid)
         await ws.send(json.dumps({"type": "auth_result", "status": "ok"}))
         return

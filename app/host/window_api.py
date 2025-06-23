@@ -73,6 +73,7 @@ class ConnectApi:
                 "uuid": uuid,
                 "last_connection": last_connection
             })
+        return devices
 
     def delete_registered_device(self, uuid):
         logger.info(f"delete_registered_device: {uuid}")
