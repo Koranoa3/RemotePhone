@@ -66,6 +66,8 @@ window.addEventListener('pywebviewready', async function () {
 
     // --- デバイス接続画面 ---
     async function updatePasskey() {
+        if (!is_section_active('connect')) return;
+
         const res = await pywebview.api.connect.get_current_passkey();
         document.getElementById('large-passkey').textContent = res.passkey;
         document.getElementById('timer-text-large').textContent = `残り ${res.remain}秒`;
@@ -75,6 +77,8 @@ window.addEventListener('pywebviewready', async function () {
     updatePasskey();
 
     async function updateRegisteredDevices() {
+        if (!is_section_active('connect')) return;
+        
         const list = await pywebview.api.connect.get_registered_devices();
         const container = document.querySelector('.device-list');
         container.innerHTML = '';
@@ -127,6 +131,7 @@ window.addEventListener('pywebviewready', async function () {
             };
         });
     }
+    setInterval(updateRegisteredDevices, 60000);
 
     // --- 設定 ---
     async function updateSettings() {
@@ -249,3 +254,8 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('connect').classList.add('active');
     }
 });
+
+function is_section_active(sectionId) {
+    const section = document.getElementById(sectionId);
+    return section && section.classList.contains('active');
+}
