@@ -5,8 +5,9 @@ from app.client.interactables import trackpad, action, volume, button
 from logging import getLogger
 logger = getLogger(__name__)
 
-from app.host.notifer import notify
+from app.host.notifer import notify # TODO 不要なインポート
 from app.config_io import set_client_attribute
+from app.client.clients_manager import update_last_connection
 
 HEARTBEAT_INTERVAL = 3  # seconds
 HEARTBEAT_TIMEOUT = 6  # disconnect if pong is not received within this time
@@ -31,7 +32,7 @@ async def handle_client(websocket):
                     break
             except websockets.ConnectionClosedOK as e:
                 break
-            except:
+            except: # TODO: ちゃんとエラー内容をログに出力する
                 logger.error("Failed to send ping")
                 break
 
@@ -60,6 +61,7 @@ async def handle_client(websocket):
                         now = int(time.time() * 1000)
                         rtt = now - data["timestamp"]
                         last_pong = time.time()
+                        update_last_connection(websocket.uuid) # TODO: 接続状態の更新方法を改善
                         await websocket.send(json.dumps({"type": "rtt", "rtt": rtt}))
 
                     elif msg_type.startswith("tp_"):
@@ -104,6 +106,9 @@ async def handle_client(websocket):
         except websockets.ConnectionClosedError as e:
             if e.code == 1006:
                 logger.warning("Disconnected: Connection state disappeared")
+        finally:
+            if websocket.authenticated and websocket.uuid:
+                update_last_connection(websocket.uuid)
 
     await asyncio.gather(heartbeat(), listen())
 

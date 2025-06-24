@@ -7,7 +7,7 @@ logger = getLogger(__name__)
 from app.host.notifer import notify
 from app.common import get_device_id
 
-registered_uuids_path = "registered_uuids.txt"
+from app.client.clients_manager import if_uuid_registered, register_uuid, update_last_connection
 
 # --- Current Passkey Management ---
 KEY_EXPIRE = 30  # seconds
@@ -33,20 +33,6 @@ def get_current_passkey() -> dict:
     expire_in = KEY_EXPIRE - (timestamp % KEY_EXPIRE)
     return {"key": _current_key, "expire_in": expire_in}
 
-# --- Registered UUID ---
-def if_uuid_registered(uuid: str) -> bool:
-    if not os.path.exists(registered_uuids_path):
-        open(registered_uuids_path, "w").close()
-    with open(registered_uuids_path, "r+") as f:
-        registered_uuids = f.read().splitlines()
-    return uuid in registered_uuids
-
-def register_uuid(uuid: str) -> bool:
-    if if_uuid_registered(uuid):
-        return False
-    with open(registered_uuids_path, "a+") as f:
-        f.write(uuid + "\n")
-    return True
 
 # --- OTP Generation ---
 def onetime_passkey(timestamp: int = None) -> str:
@@ -98,10 +84,12 @@ class AuthSession:
 # --- Authentication Process ---
 async def on_auth_start(ws, uuid: str):
     logger.info(f"Authentication started: {uuid}")
+    ws.uuid = uuid
     if if_uuid_registered(uuid):
         logger.info("Authentication successful: UUID is already registered.")
         notify("Client has connected.")
         ws.authenticated = True
+        update_last_connection(uuid)
         await ws.send(json.dumps({"type": "auth_result", "status": "ok"}))
         return
     

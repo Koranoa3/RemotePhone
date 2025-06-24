@@ -1,4 +1,8 @@
+import time
+from datetime import datetime
+
 from app.client.authenticator import get_current_passkey
+from app.client.clients_manager import load_registered_uuids, unregister_uuid
 from app.host import host_config
 from app.host import version
 
@@ -46,16 +50,34 @@ class ConnectApi:
         }
 
     def get_registered_devices(self):
-        # 仮実装
-        return [
-            {"name": "iPhone 15 Pro", "uuid": "uuid-1", "last_connection": 0},
-            {"name": "iPad Air", "uuid": "uuid-2", "last_connection": 4320}
-        ]
+        
+        registered_uuids = load_registered_uuids()
+        devices = []
+        for uuid, info in registered_uuids.items():
+            last_connection = info.get("last_connection", None) # YYYY-MM-DD HH:MM:SS
+            if last_connection:
+                try:
+                    # 文字列をdatetimeに変換
+                    dt = datetime.strptime(str(last_connection), "%Y-%m-%d %H:%M:%S")
+                    # 現在時刻との差を分単位で計算
+                    diff = int((time.time() - dt.timestamp()) // 60)
+                    last_connection = diff
+                except Exception as e:
+                    logger.warning(f"last_connection parse error: {e}")
+                    last_connection = -1
+            else:
+                last_connection = -1
+            
+            devices.append({
+                "name": uuid.split("-")[0].upper() + "-...",
+                "uuid": uuid,
+                "last_connection": last_connection
+            })
+        return devices
 
     def delete_registered_device(self, uuid):
         logger.info(f"delete_registered_device: {uuid}")
-        # 仮実装
-        return True
+        return unregister_uuid(uuid)
 
 class SettingsApi:
     def get_settings(self):

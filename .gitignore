@@ -3,6 +3,7 @@
 .cache/
 __pycache__
 registered_uuids.txt
+registered_uuids.json
 application.log
 client_config.json
 host_config.json
