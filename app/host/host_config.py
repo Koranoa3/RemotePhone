@@ -11,11 +11,17 @@ def _get_default_config():
     with open(default_config_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def _verify_config(config):
-    default_config = _get_default_config()
-    for key in default_config:
+def _verify_config(config, default_config=None):
+    if default_config is None:
+        default_config = _get_default_config()
+    if not isinstance(config, dict) or not isinstance(default_config, dict):
+        return False
+    for key, value in default_config.items():
         if key not in config:
             return False
+        if isinstance(value, dict):
+            if not _verify_config(config[key], value):
+                return False
     return True
 
 def load():
