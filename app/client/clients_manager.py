@@ -39,6 +39,8 @@ def load_registered_uuids() -> dict:
             return data
         except Exception:
             logger.error("Failed to load registered_uuids.json, resetting file.")
+            with open(uuids_path, "w") as fw:
+                json.dump({}, fw)
             return {}
 
 def save_registered_uuids(data: dict):
