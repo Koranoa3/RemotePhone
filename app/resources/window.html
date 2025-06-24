@@ -18,9 +18,9 @@
                 <div class="app-subtitle">設定</div>
             </div>
             <nav class="nav-menu">
-                <button class="nav-item active" data-section="home">🏠 ホーム</button>
-                <button class="nav-item" data-section="connect">📲 デバイスを接続する</button>
-                <button class="nav-item" data-section="customize">🛠️ カスタマイズ</button>
+                <!-- <button class="nav-item" data-section="home">🏠 ホーム</button> -->
+                <button class="nav-item active" data-section="connect">📲 デバイスを接続する</button>
+                <!-- <button class="nav-item" data-section="customize">🛠️ カスタマイズ</button> -->
                 <button class="nav-item" data-section="settings">⚙️ 設定</button>
                 <button class="nav-item" data-section="release">📝 リリースノート</button>
             </nav>
@@ -28,7 +28,7 @@
 
         <main class="main-content">
             <!-- ホーム -->
-            <section class="content-section active" id="home">
+            <section class="content-section" id="home">
                 <h1 class="section-title">🏠 ホーム</h1>
 
                 <div class="home-grid">
@@ -84,7 +84,7 @@
                                 <div class="method-name">Bluetooth</div>
                                 <div class="method-description">最短距離で最速、かつ安全</div>
                             </div>
-                            <div class="method-option">
+                            <div class="method-option disabled">
                                 <div class="method-name">WebRTC</div>
                                 <div class="method-description">安全で、遠く離れても利用可能</div>
                             </div>
@@ -100,7 +100,7 @@
             </section>
 
             <!-- デバイスを接続する -->
-            <section class="content-section" id="connect">
+            <section class="content-section active" id="connect">
                 <h1 class="section-title">📲 デバイスを接続する</h1>
 
                 <div class="card">
@@ -181,6 +181,7 @@
             <section class="content-section" id="settings">
                 <h1 class="section-title">⚙️ 設定</h1>
 
+                <!-- TODO: システム設定項目 -->
                 <div class="card">
                     <h3 class="card-title" id="settings-system">システム</h3>
                     <div class="form-group">
@@ -203,6 +204,7 @@
                     </div>
                 </div>
 
+                <!-- TODO: アプリケーション設定項目 -->
                 <div class="card">
                     <h3 class="card-title" id="settings-application">アプリケーション</h3>
                     <div class="form-group">
@@ -225,6 +227,7 @@
                     </div>
                 </div>
 
+                <!-- TODO: 通知設定項目 -->
                 <div class="card">
                     <h3 class="card-title" id="settings-notification">通知</h3>
                     <div class="form-group">

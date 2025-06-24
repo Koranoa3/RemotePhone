@@ -218,7 +218,8 @@ window.addEventListener('pywebviewready', async function () {
     });
 
     // 初期化
-    updateHomeStatus();
+    updatePasskey();
+    updateRegisteredDevices();
 });
 
 document.addEventListener('DOMContentLoaded', function () {
