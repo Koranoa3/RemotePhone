@@ -54,11 +54,11 @@ class ConnectApi:
         registered_uuids = load_registered_uuids()
         devices = []
         for uuid, info in registered_uuids.items():
-            last_connection:str = info.get("last_connection", None) # YYYY-MM-DD HH:MM:SS
+            last_connection = info.get("last_connection", None) # YYYY-MM-DD HH:MM:SS
             if last_connection:
                 try:
                     # 文字列をdatetimeに変換
-                    dt = datetime.strptime(last_connection, "%Y-%m-%d %H:%M:%S")
+                    dt = datetime.strptime(str(last_connection), "%Y-%m-%d %H:%M:%S")
                     # 現在時刻との差を分単位で計算
                     diff = int((time.time() - dt.timestamp()) // 60)
                     last_connection = diff
