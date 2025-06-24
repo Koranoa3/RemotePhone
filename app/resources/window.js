@@ -145,9 +145,10 @@ window.addEventListener('pywebviewready', async function () {
         document.querySelector('input[type=checkbox][name=auto_restart_on_error]').checked = settings.application.auto_restart_on_error;
         // 通知
         document.getElementById('notification-master').checked = settings.notification.enable_desktop_notification;
-        document.querySelectorAll('.notification-sub')[0].checked = settings.notification.notify_authentication_request;
-        document.querySelectorAll('.notification-sub')[1].checked = settings.notification.notify_device_connect;
-        document.querySelectorAll('.notification-sub')[2].checked = settings.notification.notify_device_disconnect;
+        document.querySelectorAll('.notification-sub')[0].checked = settings.notification.notify_application_error;
+        document.querySelectorAll('.notification-sub')[1].checked = settings.notification.notify_authentication_request;
+        document.querySelectorAll('.notification-sub')[2].checked = settings.notification.notify_device_connect;
+        document.querySelectorAll('.notification-sub')[3].checked = settings.notification.notify_device_disconnect;
     }
     updateSettings();
 
@@ -166,9 +167,10 @@ window.addEventListener('pywebviewready', async function () {
                 },
                 notification: {
                     enable_desktop_notification: document.getElementById('notification-master').checked,
-                    notify_authentication_request: document.querySelectorAll('.notification-sub')[0].checked,
-                    notify_device_connect: document.querySelectorAll('.notification-sub')[1].checked,
-                    notify_device_disconnect: document.querySelectorAll('.notification-sub')[2].checked
+                    notify_application_error: document.querySelectorAll('.notification-sub')[0].checked,
+                    notify_authentication_request: document.querySelectorAll('.notification-sub')[1].checked,
+                    notify_device_connect: document.querySelectorAll('.notification-sub')[2].checked,
+                    notify_device_disconnect: document.querySelectorAll('.notification-sub')[3].checked
                 }
             });
         });
