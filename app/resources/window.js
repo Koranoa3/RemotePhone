@@ -149,6 +149,14 @@ window.addEventListener('pywebviewready', async function () {
         document.querySelectorAll('.notification-sub')[1].checked = settings.notification.notify_authentication_request;
         document.querySelectorAll('.notification-sub')[2].checked = settings.notification.notify_device_connect;
         document.querySelectorAll('.notification-sub')[3].checked = settings.notification.notify_device_disconnect;
+        // 通知サブ項目の有効/無効切り替え
+        document.querySelectorAll('.notification-sub').forEach(sub => {
+            if (!settings.notification.enable_desktop_notification) {
+                sub.classList.add('disabled');
+            } else {
+                sub.classList.remove('disabled');
+            }
+        });
     }
     updateSettings();
 
@@ -171,6 +179,14 @@ window.addEventListener('pywebviewready', async function () {
                     notify_authentication_request: document.querySelectorAll('.notification-sub')[1].checked,
                     notify_device_connect: document.querySelectorAll('.notification-sub')[2].checked,
                     notify_device_disconnect: document.querySelectorAll('.notification-sub')[3].checked
+                }
+            });
+            // 通知サブ項目の有効/無効切り替え
+            document.querySelectorAll('.notification-sub').forEach(sub => {
+                if (!document.getElementById('notification-master').checked) {
+                    sub.classList.add('disabled');
+                } else {
+                    sub.classList.remove('disabled');
                 }
             });
         });
