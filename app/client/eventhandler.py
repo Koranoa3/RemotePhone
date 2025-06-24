@@ -5,7 +5,7 @@ from app.client.interactables import trackpad, action, volume, button
 from logging import getLogger
 logger = getLogger(__name__)
 
-from app.host.notifer import notify # TODO 不要なインポート
+from app.host.notifer import notify, NotificationCategory
 from app.config_io import set_client_attribute
 from app.client.clients_manager import update_last_connection
 
@@ -107,6 +107,7 @@ async def handle_client(websocket):
             if e.code == 1006:
                 logger.warning("Disconnected: Connection state disappeared")
         finally:
+            notify(NotificationCategory.ON_DISCONNECT, "Client has disconnected.")
             if websocket.authenticated and websocket.uuid:
                 update_last_connection(websocket.uuid)
 

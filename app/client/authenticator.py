@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from logging import getLogger
 logger = getLogger(__name__)
 
-from app.host.notifer import notify
+from app.host.notifer import notify, NotificationCategory
 from app.common import get_device_id
 
 from app.client.clients_manager import if_uuid_registered, register_uuid, update_last_connection
@@ -87,7 +87,7 @@ async def on_auth_start(ws, uuid: str):
     ws.uuid = uuid
     if if_uuid_registered(uuid):
         logger.info("Authentication successful: UUID is already registered.")
-        notify("Client has connected.")
+        notify(NotificationCategory.ON_CONNECT, "Client has connected.")
         ws.authenticated = True
         update_last_connection(uuid)
         await ws.send(json.dumps({"type": "auth_result", "status": "ok"}))
@@ -97,7 +97,7 @@ async def on_auth_start(ws, uuid: str):
     passkey_info = get_current_passkey()
     passkey = passkey_info["key"]
     logger.info(f"Authentication OTP: {passkey}")
-    notify(f"Authentication request received from client.\nOne-time key: {passkey}", duration=10, title="Authentication Request")
+    notify(NotificationCategory.ON_AUTH, f"Authentication request received from client.\nOne-time key: {passkey}", duration=10, title="Authentication Request")
     await ws.send(json.dumps({"type": "auth_needed", "message": "Please enter the one-time key issued by the host."}))
 
 async def send_auth_needed(ws, message: str):
@@ -109,7 +109,7 @@ async def send_auth_needed(ws, message: str):
     passkey = passkey_info["key"]
     ws.auth.timestamp = int(time.time())
     logger.info(f"Authentication OTP reissued: {passkey}")
-    notify(f"Authentication request received again from client.\nOne-time key: {passkey}", duration=10, title="Authentication Request")
+    notify(NotificationCategory.ON_AUTH, f"Authentication request received again from client.\nOne-time key: {passkey}", duration=10, title="Authentication Request")
 
     await ws.send(json.dumps({
         "type": "auth_needed",
@@ -126,7 +126,7 @@ async def handle_auth_response(ws, onetime: str):
     if status == "ok":
         ws.authenticated = True
         logger.info("Authentication successful")
-        notify("Client has connected.")
+        notify(NotificationCategory.ON_CONNECT, "Client has connected.")
         if register_uuid(ws.auth.uuid):
             logger.info("UUID registered successfully.")
         else:

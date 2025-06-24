@@ -3,7 +3,7 @@ from logging import getLogger
 
 import pystray
 from PIL import Image
-from app.host.notifer import notify
+from app.host.notifer import notify, NotificationCategory
 from app.host.window import start_webview_process, stop_webview_process
 
 logger = getLogger(__name__)
@@ -44,7 +44,7 @@ def _generate_menu():
 
 def _on_reconnect(icon, item):
     logger.info("Reconnect requested.")
-    notify("Attempting to restart the connection.")
+    notify(NotificationCategory.ON_APP_ANOMALY, "Attempting to restart the connection.")
 
     threading.Thread(target=_do_reconnect, daemon=True).start()
 

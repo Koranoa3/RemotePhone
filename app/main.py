@@ -12,7 +12,7 @@ config.dictConfig(log_conf)
 logger = getLogger(__name__)
 logger.info("Initializing...")
 
-from app.host.notifer import notify
+from app.host.notifer import notify, NotificationCategory
 
 ### core process thread ###############################
 
@@ -53,13 +53,13 @@ def register_with_retry():
             return
         else:
             retry_after = attempts ** 2 + 5
-            notify(f"Registration failed. Retrying in {retry_after} seconds.")
+            notify(NotificationCategory.ON_APP_ANOMALY, f"Registration failed. Retrying in {retry_after} seconds.")
             logger.info(f"Registration failed. Retrying in {retry_after} seconds.")
             time.sleep(retry_after)
             attempts += 1
 
     update_tray("Disconnected")
-    notify("Registration failed. Please reconnect manually from the menu.")
+    notify(NotificationCategory.ON_APP_ANOMALY, "Registration failed. Please reconnect manually from the menu.")
     logger.error("Registration failed.")
 
 
