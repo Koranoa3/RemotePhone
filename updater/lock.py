@@ -1,7 +1,7 @@
 import os
 import sys
 import atexit
-from config import LOCK_FILE
+from updater.config import LOCK_FILE
 
 def create_lock():
     if os.path.exists(LOCK_FILE):

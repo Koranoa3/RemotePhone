@@ -1,6 +1,6 @@
 import requests
 import time
-from config import MAX_RETRIES, DOWNLOAD_URL
+from updater.config import MAX_RETRIES, DOWNLOAD_URL
 
 def download_update(zip_path, window):
     for attempt in range(1, MAX_RETRIES + 1):

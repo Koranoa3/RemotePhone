@@ -1,6 +1,6 @@
 import os
 import re
-from config import APP_DIR_PREFIX
+from updater.config import APP_DIR_PREFIX, VERSION_INFO_URL
 
 def parse_version_name(name):
     match = re.match(r"app-(v\d+\.\d+\.\d+)", name)

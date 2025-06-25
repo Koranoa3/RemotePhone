@@ -2,16 +2,16 @@ import os
 import sys
 import shutil
 import psutil
-from config import TEMP_DIR, APP_DIR_PREFIX, EXE_NAME
-from ui import UpdaterWindow
-from version import get_current_version
-from downloader import download_update, extract_zip
-from cleaner import delete_old_app
-from launcher import launch_new_app
-from lock import create_lock
 import requests
 import platform
 import tkinter.messagebox as messagebox
+from updater.config import TEMP_DIR, APP_DIR_PREFIX, EXE_NAME, VERSION_INFO_URL
+from updater.ui import UpdaterWindow
+from updater.version import get_current_version
+from updater.downloader import download_update, extract_zip
+from updater.cleaner import delete_old_app
+from updater.launcher import launch_new_app
+from updater.lock import create_lock
 
 def is_windows():
     return platform.system() == "Windows"

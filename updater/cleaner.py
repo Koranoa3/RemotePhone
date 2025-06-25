@@ -1,5 +1,5 @@
 import shutil
-from version import get_local_versions
+from updater.version import get_local_versions
 
 def delete_old_app(window):
     versions = get_local_versions()
