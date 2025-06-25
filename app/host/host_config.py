@@ -24,6 +24,19 @@ def _verify_config(config, default_config=None):
                 return False
     return True
 
+def _get_changed_items(new_config, old_config):
+        result = {}
+        for key in new_config:
+            if key not in old_config:
+                result[key] = None if not isinstance(new_config[key], dict) else {}
+            elif isinstance(new_config[key], dict) and isinstance(old_config[key], dict):
+                nested = _get_changed_items(new_config[key], old_config[key])
+                if nested:
+                    result[key] = nested
+            elif new_config[key] != old_config[key]:
+                result[key] = old_config[key]
+        return result
+
 def load():
     try:
         with open(config_path, "r", encoding="utf-8") as f:
@@ -37,6 +50,14 @@ def load():
     return config
 
 def save(config):
+    try:
+        with open(config_path, "r", encoding="utf-8") as f:
+            old_config = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        old_config = _get_default_config()
+
+    changed_keys = _get_changed_items(config, old_config)
+    
     if not _verify_config(config):
         raise ValueError("Config missing required keys.")
     with open(config_path, "w", encoding="utf-8") as f:
