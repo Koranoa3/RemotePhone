@@ -1,5 +1,6 @@
 import os
 import re
+import requests
 from updater.config import APP_DIR_PREFIX, VERSION_INFO_URL
 
 def parse_version_name(name):
@@ -18,6 +19,15 @@ def get_local_versions():
             versions.append((version, d))
     return sorted(versions, key=lambda x: version_to_tuple(x[0]), reverse=True)
 
-def get_current_version():
+def get_installed_version():
     versions = get_local_versions()
     return versions[0] if versions else (None, None)
+
+def get_latest_version():
+    try:
+        res = requests.get(VERSION_INFO_URL, timeout=5)
+        res.raise_for_status()
+        return res.json().get("version")
+    except Exception as e:
+        print(f"[Error] Failed to fetch the latest version: {e}")
+        return None

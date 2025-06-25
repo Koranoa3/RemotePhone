@@ -7,7 +7,7 @@ import platform
 import tkinter.messagebox as messagebox
 from updater.config import TEMP_DIR, APP_DIR_PREFIX, EXE_NAME, VERSION_INFO_URL
 from updater.ui import UpdaterWindow
-from updater.version import get_current_version
+from updater.version import get_installed_version, get_latest_version
 from updater.downloader import download_update, extract_zip
 from updater.cleaner import delete_old_app
 from updater.launcher import launch_new_app
@@ -25,15 +25,6 @@ def is_process_running(name):
             continue
     return False
 
-def get_latest_version():
-    from config import VERSION_INFO_URL
-    try:
-        res = requests.get(VERSION_INFO_URL, timeout=5)
-        res.raise_for_status()
-        return res.json().get("version")
-    except Exception as e:
-        print(f"[Error] Failed to fetch the latest version: {e}")
-        return None
     
 def main():
     if not is_windows():
@@ -48,22 +39,25 @@ def main():
 
     window = UpdaterWindow()
     window.run_in_thread()
-    window.set_status("Checking for updates...")
+    window.set_status("Preparing to launch...")
 
-    current_version, current_version_dir = get_current_version()
+    current_version, current_version_dir = get_installed_version()
     print(f"Current version: {current_version if current_version else 'None'}")
 
-    latest_version = get_latest_version()
-    if not latest_version:
-        print("[Abort] Failed to fetch the latest version")
-        return
+    app_dir = current_version_dir
+    
+    # ローカルにバージョンが何もなかったらダウンロード
+    if not current_version:
+        print("No local version found. Starting download process.")
+        window.set_status("Downloading latest version...")
+        
+        latest_version = get_latest_version()
+        if not latest_version:
+            print("[Abort] Failed to fetch the latest version")
+            messagebox.showerror("Error", "Failed to fetch version information.")
+            window.close()
+            return
 
-    print(f"Latest version: {latest_version}")
-
-    app_dir = current_version_dir if current_version else None
-    if not current_version == latest_version:
-        print("Starting the update process.")
-        window.set_status("Downloading update...")
         os.makedirs(TEMP_DIR, exist_ok=True)
         zip_path = os.path.join(TEMP_DIR, "update.zip")
         if download_update(zip_path, window):
@@ -74,18 +68,26 @@ def main():
             window.set_status("Extracting...")
             extract_zip(zip_path, app_dir)
             shutil.rmtree(TEMP_DIR)
-            print("Update complete. Launching the new version.")
+            print("Download complete.")
         else:
             print("[Abort] Failed to download the update")
+            messagebox.showerror("Error", "Failed to download application.")
+            window.close()
+            return
 
     if app_dir and os.path.exists(app_dir):
         delete_old_app(window)
         window.set_status("Launching...")
         new_app_path = os.path.join(app_dir, EXE_NAME)
-        launch_new_app(new_app_path)
+        if os.path.exists(new_app_path):
+            launch_new_app(new_app_path)
+        else:
+            print(f"Executable not found: {new_app_path}")
+            messagebox.showerror("Error", f"Executable not found: {EXE_NAME}")
     else:
         print("Application not found.")
         window.set_status("Application not found.")
+        messagebox.showerror("Error", "Application not found.")
 
     window.close()
 
