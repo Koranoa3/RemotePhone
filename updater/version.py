@@ -1,7 +1,8 @@
 import os
 import re
 import requests
-from updater.config import APP_DIR_PREFIX, VERSION_INFO_URL
+import json
+from updater.config import APP_DIR_PREFIX, VERSION_INFO_URL, CONFIG_PATH
 
 def parse_version_name(name):
     match = re.match(r"app-(v\d+\.\d+\.\d+)", name)
@@ -31,3 +32,18 @@ def get_latest_version():
     except Exception as e:
         print(f"[Error] Failed to fetch the latest version: {e}")
         return None
+
+def is_auto_update_enabled():
+    try:
+        with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
+            config = json.load(f)
+            return config.get("application", {}).get("enable_auto_update", False)
+    except FileNotFoundError:
+        print("[Warning] Configuration file not found. Auto-update is disabled.")
+        return False
+    except json.JSONDecodeError:
+        print("[Error] Invalid configuration file format. Auto-update is disabled.")
+        return False
+    except Exception as e:
+        print(f"[Error] Unexpected error reading config: {e}")
+        return False

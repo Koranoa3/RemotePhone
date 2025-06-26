@@ -8,3 +8,4 @@ APP_DIR_PREFIX = "app-"
 EXE_NAME = "RemotePhoneHost.exe"
 MAX_RETRIES = 10
 LOCK_FILE = os.path.join(tempfile.gettempdir(), 'updater.lock')
+CONFIG_PATH = "host_config.json"
