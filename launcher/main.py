@@ -1,5 +1,6 @@
 import sys
 import threading
+from tkinter import messagebox
 
 from launcher.modules.version_utils import get_installed_version, get_latest_version
 from launcher.modules.installer import install_release, cleanup
@@ -17,7 +18,13 @@ def run(window):
         latest_version = get_latest_version()
         force_update = installed_version is None or latest_version is None or is_force_update_mode()
         if installed_version != latest_version or force_update:
-            install_release(latest_version, window, force_update)
+            if install_release(latest_version, window, force_update):
+                window.set_status("Update completed successfully.")
+            else:
+                messagebox.showerror("Error", "Failed to update the application. Please try again later.")
+                window.close()
+                return
+
     # 3. 起動
     window.set_status("Launching application...")
     cleanup()
