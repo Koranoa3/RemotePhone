@@ -1,10 +1,10 @@
 import json
+import sys
 
 CONFIG_PATH = "host_config.json"
 
 def is_force_update_mode() -> bool:
-    # TODO
-    return False
+    return "--force-update" in sys.argv
 
 def is_auto_update_enabled() -> bool:
     try:
