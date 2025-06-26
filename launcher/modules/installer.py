@@ -4,6 +4,7 @@ import time
 import requests
 
 MAX_RETRIES = 10
+MAX_TIMEOUT = 10
 RELEASES_URL = "http://skyboxx.tplinkdns.com:8000/api/releases"
 TEMP_DIR = "temp"
 RETRY_DELAYS = [3, 5, 10, 20, 30]  # seconds
@@ -11,11 +12,12 @@ RETRY_DELAYS = [3, 5, 10, 20, 30]  # seconds
 from launcher.modules.version_utils import get_local_versions, APP_DIR_PREFIX
 from launcher.modules.window import UpdaterWindow
 
-def install_release(version, window:UpdaterWindow) -> None:
+def install_release(version, window:UpdaterWindow, force_retry:False) -> None:
+    print(("[force update]" if force_retry else "")+"Downloading version:", version)
     window.set_status("Downloading latest version...")
     os.makedirs(TEMP_DIR, exist_ok=True)
     zip_path = os.path.join(TEMP_DIR, "update.zip")
-    for result in _download_update(version, zip_path):
+    for result in _download_update(version, zip_path, force_retry):
         if result is True:
             app_dir = f"{APP_DIR_PREFIX}{version}"
             if os.path.exists(app_dir):
@@ -25,9 +27,11 @@ def install_release(version, window:UpdaterWindow) -> None:
             _extract_zip(zip_path, app_dir)
             print("Update extracted successfully.")
             break
-        else:
-            window.set_status(f"Download failed. Retrying in {result} seconds...")
-            time.sleep(result)
+        elif type(result) is int:
+            if result == 0:
+                window.set_status("Downloading latest version...")
+            else:
+                window.set_status(f"Download failed. Retrying in {result} seconds...")
     else:
         print("[Abort] Failed to download the update")
 
@@ -41,11 +45,14 @@ def cleanup() -> None:
         except Exception as e:
             print(f"[Error] Failed to delete old version: {e}")
 
-def _download_update(version, zip_path):
-    for attempt in range(1, MAX_RETRIES + 1):
+def _download_update(version, zip_path, force_retry=False):
+    attempt = 1
+    while force_retry or attempt <= MAX_RETRIES:
+        print(f"[Attempt {attempt}] Downloading version {version}...")
         try:
+            if attempt < 3: raise Exception("Simulated failure")  # Simulate failure for testing
             download_url = f"{RELEASES_URL}/{version}/download"
-            res = requests.get(download_url, timeout=10)
+            res = requests.get(download_url, timeout=MAX_TIMEOUT)
             res.raise_for_status()
             with open(zip_path, "wb") as f:
                 f.write(res.content)
@@ -57,6 +64,8 @@ def _download_update(version, zip_path):
             for remaining in range(wait_time, 0, -1):
                 yield remaining
                 time.sleep(1)
+            yield 0
+            attempt += 1
     return False
 
 def _extract_zip(zip_path, extract_to) -> None:

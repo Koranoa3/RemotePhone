@@ -3,6 +3,7 @@ import re
 import requests
 
 VERSION_INFO_URL = "http://skyboxx.tplinkdns.com:8000/api/releases/latest/version"
+MAX_TIMEOUT = 10
 APP_DIR_PREFIX = "app-"
 
 def get_installed_version() -> str|None:
@@ -11,7 +12,7 @@ def get_installed_version() -> str|None:
 
 def get_latest_version() -> str|None:
     try:
-        res = requests.get(VERSION_INFO_URL, timeout=5)
+        res = requests.get(VERSION_INFO_URL, timeout=MAX_TIMEOUT)
         res.raise_for_status()
         return res.json().get("version")
     except Exception as e:

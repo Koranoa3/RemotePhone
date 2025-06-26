@@ -15,8 +15,9 @@ def run(window):
     if installed_version is None or is_auto_update_enabled() or is_force_update_mode():
         window.set_status("Checking for updates...")
         latest_version = get_latest_version()
-        if installed_version != latest_version:
-            install_release(latest_version, window)
+        force_update = installed_version is None or latest_version is None or is_force_update_mode()
+        if installed_version != latest_version or force_update:
+            install_release(latest_version, window, force_update)
     # 3. 起動
     window.set_status("Launching application...")
     cleanup()
