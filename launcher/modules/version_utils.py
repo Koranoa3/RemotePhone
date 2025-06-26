@@ -7,7 +7,7 @@ APP_DIR_PREFIX = "app-"
 
 def get_installed_version() -> str|None:
     versions = get_local_versions()
-    return versions[0] if versions else (None, None)
+    return versions[0][0] if versions else None
 
 def get_latest_version() -> str|None:
     try:

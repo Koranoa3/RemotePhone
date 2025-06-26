@@ -32,7 +32,8 @@ def install_release(version, window:UpdaterWindow) -> None:
         print("[Abort] Failed to download the update")
 
 def cleanup() -> None:
-    shutil.rmtree(TEMP_DIR)
+    if os.path.exists(TEMP_DIR):
+        shutil.rmtree(TEMP_DIR)
     versions = get_local_versions()
     for _, dir_name in versions[1:]:  # 最新を除く
         try:
