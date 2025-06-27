@@ -91,6 +91,10 @@ def main():
     register_thread = threading.Thread(target=register_with_retry, daemon=True)
     register_thread.start()
 
+    # command server for showing window
+    from app.host.app_command import command_server
+    threading.Thread(target=command_server, daemon=True).start()
+
     from app.config_io import get_host_attribute
     if get_host_attribute("system").get("show_window_on_start", False):
         from app.host.window import start_webview_process
