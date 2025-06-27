@@ -56,4 +56,4 @@ def notify(type: NotificationCategory, message:str, title="RemotePhone", duratio
             timeout=duration
         )
     except Exception as e:
-        logger.error(f"Notification sending error: {e}")
+        logger.exception(f"Notification sending error: {e}")

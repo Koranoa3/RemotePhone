@@ -32,8 +32,8 @@ async def handle_client(websocket):
                     break
             except websockets.ConnectionClosedOK as e:
                 break
-            except: # TODO: ちゃんとエラー内容をログに出力する
-                logger.error("Failed to send ping")
+            except Exception as e:
+                logger.exception(f"Failed to send ping: {e}")
                 break
 
     async def listen():
@@ -94,7 +94,7 @@ async def handle_client(websocket):
                     else:
                         logger.info(f"Message with unrecognized type: {data}")
                 except Exception as e:
-                    logger.error(f"Error processing message: {e}")
+                    logger.exception(f"Error processing message: {e}")
 
         except websockets.ConnectionClosedOK as e:
             if e.code == 1001:

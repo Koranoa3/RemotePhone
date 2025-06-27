@@ -19,7 +19,7 @@ def run_tray():
     try:
         tray_icon.run()
     except Exception as e:
-        logger.error(f"Error occurred in system tray: {e}")
+        logger.exception(f"Error occurred in system tray: {e}")
     finally:
         stop_webview_process()
         logger.info("System tray icon stopped.")
