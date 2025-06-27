@@ -2,6 +2,7 @@ import platform
 import psutil
 import os
 import subprocess
+import socket
 import tempfile
 import atexit
 import tkinter.messagebox as messagebox
@@ -10,6 +11,7 @@ from launcher.modules.version_utils import get_latest_app_dir
 
 EXE_NAME = "RemotePhoneHost.exe"
 LOCK_FILE = os.path.join(tempfile.gettempdir(), 'RemotePhoneLauncher.lock')
+COMMAND_PORT = 63136
 
 def prevent_mistaken_launch() -> bool:
     if not _is_windows():
@@ -17,7 +19,7 @@ def prevent_mistaken_launch() -> bool:
         return False
 
     if _is_process_running(EXE_NAME):
-        messagebox.showerror("Error", f"{EXE_NAME} is already running.")
+        show_application_window()
         return False
     
     return _create_lock()
@@ -32,6 +34,14 @@ def launch_app() -> None:
         subprocess.Popen([app_path], shell=False)
     except Exception as e:
         print(f"[Error] Failed to launch the new app: {e}") 
+
+def show_application_window() -> None:
+    try:
+        with socket.create_connection(("127.0.0.1", COMMAND_PORT), timeout=1) as sock:
+            sock.sendall(b"show_window")
+            print("Sent command to the existing application")
+    except (ConnectionRefusedError, TimeoutError):
+        print("[ERROR] The application is not running or is not responding")
 
 
 def _is_windows() -> bool:
