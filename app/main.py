@@ -91,6 +91,11 @@ def main():
     register_thread = threading.Thread(target=register_with_retry, daemon=True)
     register_thread.start()
 
+    from app.config_io import get_host_attribute
+    if get_host_attribute("system").get("show_window_on_start", False):
+        from app.host.window import start_webview_process
+        start_webview_process()
+
     run_tray()
     logger.info("Application exited.")
     
