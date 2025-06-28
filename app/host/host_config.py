@@ -24,13 +24,13 @@ def _verify_config(config, default_config=None):
                 return False
     return True
 
-def _get_changed_items(new_config, old_config):
+def _get_changed_items_old(new_config, old_config):
         result = {}
         for key in new_config:
             if key not in old_config:
                 result[key] = None if not isinstance(new_config[key], dict) else {}
             elif isinstance(new_config[key], dict) and isinstance(old_config[key], dict):
-                nested = _get_changed_items(new_config[key], old_config[key])
+                nested = _get_changed_items_old(new_config[key], old_config[key])
                 if nested:
                     result[key] = nested
             elif new_config[key] != old_config[key]:
@@ -56,9 +56,13 @@ def save(config):
     except (FileNotFoundError, json.JSONDecodeError):
         old_config = _get_default_config()
 
-    changed_keys = _get_changed_items(config, old_config)
+    changed_keys_old = _get_changed_items_old(config, old_config)
     
     if not _verify_config(config):
         raise ValueError("Config missing required keys.")
     with open(config_path, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=4)
+    
+    if "run_on_startup" in changed_keys_old.get("system", {}):
+        from app.host.startup import update_run_on_startup
+        update_run_on_startup(config.get("system", {}).get("run_on_startup", False))

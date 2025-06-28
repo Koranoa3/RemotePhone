@@ -1,6 +1,6 @@
 {
         "system": {
-            "run_on_startup": true,
+            "run_on_startup": false,
             "show_window_on_start": true
         },
         "application": {
