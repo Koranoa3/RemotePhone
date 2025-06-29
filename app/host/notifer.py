@@ -2,7 +2,7 @@
 from plyer import notification
 from enum import Enum
 
-from app.host.host_config import load as load_host_config
+from app.config_io import load_host_config
 
 from logging import getLogger
 logger = getLogger(__name__)

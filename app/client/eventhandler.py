@@ -6,7 +6,7 @@ from logging import getLogger
 logger = getLogger(__name__)
 
 from app.host.notifer import notify, NotificationCategory
-from app.config_io import set_client_attribute
+from app.config_io import set_client_attribute, load_client_config
 from app.client.clients_manager import update_last_connection
 
 HEARTBEAT_INTERVAL = 3  # seconds
@@ -84,8 +84,13 @@ async def handle_client(websocket):
                         await respond(websocket, msg_sender, response)
 
                     elif msg_type == "get_config":
-                        with open("client_config.json", "r", encoding="utf-8") as f:
-                            config_data = json.load(f)
+                        config_data = load_client_config()
+                        if not config_data:
+                            logger.info("Client config is empty, creating from default config")
+                            config_data = {
+                                "prefered_layout_mode": "default",
+                                "other_settings": {}
+                            }
                         await websocket.send(json.dumps({"type": "config", "config": config_data}))
 
                     elif msg_type == "prefered_layout_mode":
