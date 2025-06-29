@@ -22,7 +22,7 @@ def run_webview():
         resizable=True, min_size=(800, 480),
         js_api=api
     )
-    webview.start(debug=True)
+    webview.start(debug=False)
 
 def start_webview_process():
     global webview_process
