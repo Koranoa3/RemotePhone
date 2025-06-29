@@ -40,5 +40,5 @@ def register(server_url: str, port: int = 8765) -> bool:
         logger.error(f"Failed to register host information: {type(e.__cause__)}")
         return False
     except Exception as e:
-        logger.error("Failed to register host information:", e)
+        logger.exception("Failed to register host information:", e)
         return False

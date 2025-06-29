@@ -31,7 +31,7 @@
                 }
             },
             {
-                "label": "▲",
+                "label": "\u25b2",
                 "type": "action",
                 "command": "up",
                 "position": {
@@ -44,7 +44,7 @@
                 }
             },
             {
-                "label": "▼",
+                "label": "\u25bc",
                 "type": "action",
                 "command": "down",
                 "position": {
@@ -57,7 +57,7 @@
                 }
             },
             {
-                "label": "◀",
+                "label": "\u25c0",
                 "type": "action",
                 "command": "left",
                 "position": {
@@ -70,7 +70,7 @@
                 }
             },
             {
-                "label": "▶",
+                "label": "\u25b6",
                 "type": "action",
                 "command": "right",
                 "position": {

@@ -75,7 +75,7 @@ class Release:
         except requests.exceptions.RequestException as e:
             logger.error(f"Network error while fetching release info for {self._version}: {e}")
         except Exception as e:
-            logger.error(f"Error while fetching release info for {self._version}: {e}")
+            logger.exception(f"Error while fetching release info for {self._version}: {e}")
 
     def _save_to_cache(self):
         """Save release data to cache file"""
@@ -98,7 +98,7 @@ class Release:
                 with open(self.json_path, "w", encoding="utf-8") as f:
                     json.dump(cache_data, f, ensure_ascii=False, indent=2)
         except Exception as e:
-            logger.error(f"Error while saving release info to cache: {e}")
+            logger.exception(f"Error while saving release info to cache: {e}")
 
     def is_latest(self) -> bool:
         """
@@ -171,7 +171,7 @@ def get_installed_version() -> str:
         else:
             raise FileNotFoundError("Version file not found")
     except Exception as e:
-        logger.error(f"Error getting installed version: {e}")
+        logger.exception(f"Error getting installed version: {e}")
         return "unknown"
 
 
@@ -191,7 +191,7 @@ def get_latest_version() -> str:
         logger.error(f"Network error while fetching latest version: {e}")
         return "unknown"
     except Exception as e:
-        logger.error(f"Error while fetching latest version: {e}")
+        logger.exception(f"Error while fetching latest version: {e}")
         return "unknown"
 
 

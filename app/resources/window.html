@@ -84,7 +84,7 @@
                                 <div class="method-name">Bluetooth</div>
                                 <div class="method-description">最短距離で最速、かつ安全</div>
                             </div>
-                            <div class="method-option">
+                            <div class="method-option disabled">
                                 <div class="method-name">WebRTC</div>
                                 <div class="method-description">安全で、遠く離れても利用可能</div>
                             </div>
@@ -100,7 +100,7 @@
             </section>
 
             <!-- デバイスを接続する -->
-            <section class="content-section" id="connect">
+            <section class="content-section active" id="connect">
                 <h1 class="section-title">📲 デバイスを接続する</h1>
 
                 <div class="card">
@@ -220,7 +220,8 @@
                             </label>
                         </label>
                     </div>
-                    <div class="form-group">
+                    <!-- TODO: アプリケーション設定項目 -->
+                    <!-- <div class="form-group">
                         <label class="form-label">
                             異常時に自動で再起動する
                             <label class="toggle-switch">
@@ -228,7 +229,7 @@
                                 <span class="slider"></span>
                             </label>
                         </label>
-                    </div>
+                    </div> -->
                 </div>
 
                 <div class="card">
@@ -243,6 +244,15 @@
                         </label>
                     </div>
                     <div class="notification-sub-settings" id="notification-sub-settings">
+                        <div class="form-group sub-setting">
+                            <label class="form-label">
+                                異常発生時
+                                <label class="toggle-switch">
+                                    <input type="checkbox" class="notification-sub">
+                                    <span class="slider"></span>
+                                </label>
+                            </label>
+                        </div>
                         <div class="form-group sub-setting">
                             <label class="form-label">
                                 認証要求時

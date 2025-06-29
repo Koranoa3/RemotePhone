@@ -458,6 +458,9 @@ body {
 input:checked+.slider {
     background-color: var(--accent-main);
 }
+input:checked.disabled+.slider {
+    background-color: var(--accent-disabled);
+}
 
 input:checked+.slider:before {
     transform: translateX(26px);
