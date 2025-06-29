@@ -1,8 +1,13 @@
-import threading, asyncio, tkinter as tk
+import threading, asyncio
 import time, json, sys
 
 
 ### logging ###############################
+
+import os
+log_file = "application.log"
+if os.path.exists(log_file) and __name__ == "__main__":
+    os.remove(log_file)
 
 from logging import getLogger, config
 from app.common import resource_path
