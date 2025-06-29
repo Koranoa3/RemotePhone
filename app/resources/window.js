@@ -142,7 +142,7 @@ window.addEventListener('pywebviewready', async function () {
         document.querySelector('input[type=checkbox][name=show_window_on_start]').checked = settings.system.show_window_on_start;
         // アプリ
         document.querySelector('input[type=checkbox][name=enable_auto_update]').checked = settings.application.enable_auto_update;
-        document.querySelector('input[type=checkbox][name=auto_restart_on_error]').checked = settings.application.auto_restart_on_error;
+        // document.querySelector('input[type=checkbox][name=auto_restart_on_error]').checked = settings.application.auto_restart_on_error;
         // 通知
         document.getElementById('notification-master').checked = settings.notification.enable_desktop_notification;
         document.querySelectorAll('.notification-sub')[0].checked = settings.notification.notify_application_error;
@@ -171,7 +171,7 @@ window.addEventListener('pywebviewready', async function () {
                 },
                 application: {
                     enable_auto_update: document.querySelector('input[name=enable_auto_update]').checked,
-                    auto_restart_on_error: document.querySelector('input[name=auto_restart_on_error]').checked
+                    // auto_restart_on_error: document.querySelector('input[name=auto_restart_on_error]').checked
                 },
                 notification: {
                     enable_desktop_notification: document.getElementById('notification-master').checked,
