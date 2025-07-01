@@ -1,12 +1,14 @@
 import threading, asyncio
 import time, json, sys
+from multiprocessing import freeze_support
 
 
 ### logging ###############################
 
 import os
 log_file = "application.log"
-if os.path.exists(log_file) and __name__ == "__main__":
+if __name__ == "__main__" and os.path.exists(log_file):
+    freeze_support()
     os.remove(log_file)
 
 from logging import getLogger, config
@@ -109,4 +111,5 @@ def main():
     logger.info("Application exited.")
     
 if __name__ == "__main__":
+    freeze_support()
     main()
