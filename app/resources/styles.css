@@ -458,6 +458,9 @@ body {
 input:checked+.slider {
     background-color: var(--accent-main);
 }
+input:checked.disabled+.slider {
+    background-color: var(--accent-disabled);
+}
 
 input:checked+.slider:before {
     transform: translateX(26px);
@@ -636,6 +639,37 @@ input:checked+.slider:before {
     margin-bottom: var(--spacing-sm);
     display: flex;
     align-items: center;
+}
+/* Feature List Styles */
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--spacing-lg) 0;
+}
+
+.feature-list li {
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--base-bg);
+    border-radius: var(--border-radius);
+    border-left: 3px solid var(--accent-main);
+    display: flex;
+    align-items: center;
+}
+
+/* General list styles */
+ul:not(.feature-list):not(.notice-list):not(.connection-steps) {
+    padding-left: var(--spacing-xl);
+    margin: var(--spacing-md) 0;
+}
+
+ul:not(.feature-list):not(.notice-list):not(.connection-steps) li {
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.5;
+}
+
+ul:not(.feature-list):not(.notice-list):not(.connection-steps) li::marker {
+    color: var(--accent-main);
 }
 
 /* Special Components */

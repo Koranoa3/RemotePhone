@@ -10,6 +10,7 @@ webview_process:Process = None
 webview.gui = 'cef'
 
 from app.host.window_api import Api
+from app.common import app_resource_path
 
 def run_webview():
     """
@@ -17,12 +18,12 @@ def run_webview():
     """
     api =  Api()
     webview.create_window(
-        "RemotePhone", "resources/window.html",
+        "RemotePhone", app_resource_path("window.html"),
         width=1024, height=769, background_color="#3a4750",
         resizable=True, min_size=(800, 480),
         js_api=api
     )
-    webview.start(debug=True)
+    webview.start(debug=False)
 
 def start_webview_process():
     global webview_process

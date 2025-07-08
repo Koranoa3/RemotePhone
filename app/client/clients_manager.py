@@ -2,15 +2,15 @@ import os
 import json
 import datetime
 
-from app.common import resource_path
+from app.common import app_path
 
 from logging import getLogger
 logger = getLogger(__name__)
 
 old_registered_uuids_filename = "registered_uuids.txt"
 registered_uuids_filename = "registered_uuids.json"
-old_uuids_path = resource_path(old_registered_uuids_filename)
-uuids_path = resource_path(registered_uuids_filename)
+old_uuids_path = app_path(old_registered_uuids_filename)
+uuids_path = app_path(registered_uuids_filename)
 
 def migrate_registered_uuids():
     if not os.path.exists(uuids_path) and os.path.exists(old_uuids_path):

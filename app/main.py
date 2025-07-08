@@ -1,18 +1,25 @@
-import threading, asyncio, tkinter as tk
+import threading, asyncio
 import time, json, sys
+from multiprocessing import freeze_support
 
 
 ### logging ###############################
 
+import os
+log_file = "application.log"
+if __name__ == "__main__" and os.path.exists(log_file):
+    freeze_support()
+    os.remove(log_file)
+
 from logging import getLogger, config
-from app.common import resource_path
-with open(resource_path("app/resources/log_config.json"), "r", encoding="utf-8") as f:
+from app.common import app_resource_path
+with open(app_resource_path("log_config.json"), "r", encoding="utf-8") as f:
     log_conf = json.load(f)
 config.dictConfig(log_conf)
 logger = getLogger(__name__)
 logger.info("Initializing...")
 
-from app.host.notifer import notify
+from app.host.notifer import notify, NotificationCategory
 
 ### core process thread ###############################
 
@@ -53,13 +60,13 @@ def register_with_retry():
             return
         else:
             retry_after = attempts ** 2 + 5
-            notify(f"Registration failed. Retrying in {retry_after} seconds.")
+            notify(NotificationCategory.ON_APP_ANOMALY, f"Registration failed. Retrying in {retry_after} seconds.")
             logger.info(f"Registration failed. Retrying in {retry_after} seconds.")
             time.sleep(retry_after)
             attempts += 1
 
     update_tray("Disconnected")
-    notify("Registration failed. Please reconnect manually from the menu.")
+    notify(NotificationCategory.ON_APP_ANOMALY, "Registration failed. Please reconnect manually from the menu.")
     logger.error("Registration failed.")
 
 
@@ -91,8 +98,18 @@ def main():
     register_thread = threading.Thread(target=register_with_retry, daemon=True)
     register_thread.start()
 
+    # command server for showing window
+    from app.host.app_command import command_server
+    threading.Thread(target=command_server, daemon=True).start()
+
+    from app.config_io import get_host_attribute
+    if get_host_attribute("system").get("show_window_on_start", False):
+        from app.host.window import start_webview_process
+        start_webview_process()
+
     run_tray()
     logger.info("Application exited.")
     
 if __name__ == "__main__":
+    freeze_support()
     main()

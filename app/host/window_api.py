@@ -3,7 +3,7 @@ from datetime import datetime
 
 from app.client.authenticator import get_current_passkey
 from app.client.clients_manager import load_registered_uuids, unregister_uuid
-from app.host import host_config
+from app.config_io import load_host_config, save_host_config
 from app.host import version
 
 from logging import getLogger
@@ -82,16 +82,17 @@ class ConnectApi:
 class SettingsApi:
     def get_settings(self):
         logger.debug("get_settings")
-        return host_config.load()
+        return load_host_config()
 
     def set_settings(self, settings):
-        current_settings = host_config.load()
+        current_settings = load_host_config()
         for key, value in settings.items():
             if key in current_settings and isinstance(value, dict):
                 current_settings[key].update(value)
             else:
                 current_settings[key] = value
-        host_config.save(current_settings)
+        logger.debug(f"set_settings: {current_settings}")
+        save_host_config(current_settings)
         return True
 
 class ReleaseApi:

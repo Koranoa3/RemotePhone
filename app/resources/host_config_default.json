@@ -1,8 +1,15 @@
 {
-        "system": {"run_on_startup": true, "show_window_on_start": true},
-        "application": {"enable_auto_update": true, "auto_restart_on_error": false},
+        "system": {
+            "run_on_startup": false,
+            "show_window_on_start": true
+        },
+        "application": {
+            "enable_auto_update": true,
+            "auto_restart_on_error": false
+        },
         "notification": {
             "enable_desktop_notification": true,
+            "notify_application_error": true,
             "notify_authentication_request": true,
             "notify_device_connect": true,
             "notify_device_disconnect": false

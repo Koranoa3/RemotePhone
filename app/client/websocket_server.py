@@ -1,8 +1,6 @@
 import websockets
 from app.client.eventhandler import handle_client
 
-from app.host.notifer import notify
-
 from logging import getLogger
 import asyncio, threading
 logger = getLogger(__name__)

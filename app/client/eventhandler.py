@@ -5,8 +5,8 @@ from app.client.interactables import trackpad, action, volume, button
 from logging import getLogger
 logger = getLogger(__name__)
 
-from app.host.notifer import notify # TODO 不要なインポート
-from app.config_io import set_client_attribute
+from app.host.notifer import notify, NotificationCategory
+from app.config_io import set_client_attribute, load_client_config
 from app.client.clients_manager import update_last_connection
 
 HEARTBEAT_INTERVAL = 3  # seconds
@@ -32,8 +32,8 @@ async def handle_client(websocket):
                     break
             except websockets.ConnectionClosedOK as e:
                 break
-            except: # TODO: ちゃんとエラー内容をログに出力する
-                logger.error("Failed to send ping")
+            except Exception as e:
+                logger.exception(f"Failed to send ping: {e}")
                 break
 
     async def listen():
@@ -84,8 +84,13 @@ async def handle_client(websocket):
                         await respond(websocket, msg_sender, response)
 
                     elif msg_type == "get_config":
-                        with open("client_config.json", "r", encoding="utf-8") as f:
-                            config_data = json.load(f)
+                        config_data = load_client_config()
+                        if not config_data:
+                            logger.info("Client config is empty, creating from default config")
+                            config_data = {
+                                "prefered_layout_mode": "default",
+                                "other_settings": {}
+                            }
                         await websocket.send(json.dumps({"type": "config", "config": config_data}))
 
                     elif msg_type == "prefered_layout_mode":
@@ -94,7 +99,7 @@ async def handle_client(websocket):
                     else:
                         logger.info(f"Message with unrecognized type: {data}")
                 except Exception as e:
-                    logger.error(f"Error processing message: {e}")
+                    logger.exception(f"Error processing message: {e}")
 
         except websockets.ConnectionClosedOK as e:
             if e.code == 1001:
@@ -107,6 +112,7 @@ async def handle_client(websocket):
             if e.code == 1006:
                 logger.warning("Disconnected: Connection state disappeared")
         finally:
+            notify(NotificationCategory.ON_DISCONNECT, "Client has disconnected.")
             if websocket.authenticated and websocket.uuid:
                 update_last_connection(websocket.uuid)
 

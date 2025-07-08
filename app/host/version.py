@@ -15,7 +15,7 @@ import os
 import json
 import requests
 
-from app.common import resource_path
+from app.common import app_path, app_resource_path
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -41,7 +41,7 @@ class Release:
         Args:
             version (str): Version string
         """
-        self.json_path = resource_path(".cache/releases_info.json")
+        self.json_path = app_path(".cache/releases_info.json")
         self._api_url = VERSION_INFO_URL + version
         self._raw_data = {}
         self._version = version
@@ -75,7 +75,7 @@ class Release:
         except requests.exceptions.RequestException as e:
             logger.error(f"Network error while fetching release info for {self._version}: {e}")
         except Exception as e:
-            logger.error(f"Error while fetching release info for {self._version}: {e}")
+            logger.exception(f"Error while fetching release info for {self._version}: {e}")
 
     def _save_to_cache(self):
         """Save release data to cache file"""
@@ -98,7 +98,7 @@ class Release:
                 with open(self.json_path, "w", encoding="utf-8") as f:
                     json.dump(cache_data, f, ensure_ascii=False, indent=2)
         except Exception as e:
-            logger.error(f"Error while saving release info to cache: {e}")
+            logger.exception(f"Error while saving release info to cache: {e}")
 
     def is_latest(self) -> bool:
         """
@@ -164,14 +164,14 @@ def get_installed_version() -> str:
         str: Version number string or "unknown" if not available
     """
     try:
-        version_path = resource_path("app/resources/version")
+        version_path = app_resource_path("version")
         if version_path and os.path.exists(version_path):
             with open(version_path, "r") as f:
                 return f.read().strip()
         else:
             raise FileNotFoundError("Version file not found")
     except Exception as e:
-        logger.error(f"Error getting installed version: {e}")
+        logger.exception(f"Error getting installed version: {e}")
         return "unknown"
 
 
@@ -191,7 +191,7 @@ def get_latest_version() -> str:
         logger.error(f"Network error while fetching latest version: {e}")
         return "unknown"
     except Exception as e:
-        logger.error(f"Error while fetching latest version: {e}")
+        logger.exception(f"Error while fetching latest version: {e}")
         return "unknown"
 
 
