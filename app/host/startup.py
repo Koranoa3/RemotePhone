@@ -7,7 +7,7 @@ import shutil
 from pathlib import Path
 import win32com.client  # `pywin32` パッケージが必要
 
-from app.common import resource_path
+from app.common import app_path
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -17,7 +17,7 @@ EXE_NAME = "RemotePhoneLauncher.exe"
 def update_run_on_startup(enabled: bool):
     logger.info(f"Updating run on startup setting to: {enabled}")
     if enabled:
-        add_to_startup("RemotePhone", f"{resource_path(EXE_NAME)}")
+        add_to_startup("RemotePhone", f"{app_path(EXE_NAME)}")
     else:
         remove_from_startup("RemotePhone")
 

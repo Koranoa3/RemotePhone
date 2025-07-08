@@ -12,8 +12,8 @@ if __name__ == "__main__" and os.path.exists(log_file):
     os.remove(log_file)
 
 from logging import getLogger, config
-from app.common import resource_path
-with open(resource_path("app/resources/log_config.json"), "r", encoding="utf-8") as f:
+from app.common import app_resource_path
+with open(app_resource_path("log_config.json"), "r", encoding="utf-8") as f:
     log_conf = json.load(f)
 config.dictConfig(log_conf)
 logger = getLogger(__name__)

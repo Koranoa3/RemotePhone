@@ -1,6 +1,6 @@
 import os
 import json
-from app.common import resource_path
+from app.common import app_path, app_resource_path
 from logging import getLogger
 from typing import Any, Optional, Dict
 logger = getLogger(__name__)
@@ -144,13 +144,13 @@ def _on_host_config_change(changed_items: dict, old_config: dict, new_config: di
 
 # インスタンス作成
 client_config_manager = ConfigManager(
-    config_path=resource_path("client_config.json"),
-    default_config_path=resource_path("app/resources/client_config_default.json")
+    config_path=app_path("client_config.json"),
+    default_config_path=app_resource_path("client_config_default.json")
 )
 
 host_config_manager = ConfigManager(
-    config_path=resource_path("host_config.json"),
-    default_config_path=resource_path("app/resources/host_config_default.json")
+    config_path=app_path("host_config.json"),
+    default_config_path=app_resource_path("host_config_default.json")
 )
 
 

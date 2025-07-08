@@ -15,7 +15,7 @@ import os
 import json
 import requests
 
-from app.common import resource_path
+from app.common import app_path, app_resource_path
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -41,7 +41,7 @@ class Release:
         Args:
             version (str): Version string
         """
-        self.json_path = resource_path(".cache/releases_info.json")
+        self.json_path = app_path(".cache/releases_info.json")
         self._api_url = VERSION_INFO_URL + version
         self._raw_data = {}
         self._version = version
@@ -164,7 +164,7 @@ def get_installed_version() -> str:
         str: Version number string or "unknown" if not available
     """
     try:
-        version_path = resource_path("app/resources/version")
+        version_path = app_resource_path("version")
         if version_path and os.path.exists(version_path):
             with open(version_path, "r") as f:
                 return f.read().strip()
