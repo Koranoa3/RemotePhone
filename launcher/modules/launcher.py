@@ -26,7 +26,7 @@ def prevent_mistaken_launch() -> bool:
 
 
 def launch_app() -> None:
-    app_path = f"{get_latest_app_dir()}/{EXE_NAME}"
+    app_path = os.path.join(get_latest_app_dir(), EXE_NAME)
     if not os.path.exists(app_path):
         messagebox.showerror("Error", f"Application not found: {app_path}")
         return
