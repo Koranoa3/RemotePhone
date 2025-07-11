@@ -78,12 +78,12 @@ def handle_action(data):
     action = data.get("action", None)
     if action is None:
         logger.warning(f"Invalid command: {action}")
-        return
+        return "Invalid"
 
     pressure = data.get("pressure", "press") # "press" / "down" / "up"
     key_codes = resolve_action(action)
     if key_codes is None:
-        return
+        return "Invalid"
 
     if pressure == "down":
         for code in key_codes:
@@ -96,28 +96,3 @@ def handle_action(data):
         hotkey(key_codes)
     else:
         logger.warning(f"Invalid pressure value: {pressure}")
-
-
-def handle_vk(data):
-    key_code = data.get("vk", None)
-    if key_code is None:
-        logger.warning(f"Invalid command: no 'vk' argument?")
-        return
-
-    key_code = json.loads(key_code)
-    pressure = data.get("pressure", "press") # "press" / "down" / "up"
-
-    if isinstance(key_code, list):
-        if not pressure == "up":
-            hotkey(key_code)
-    elif isinstance(key_code, int):
-        if pressure == "down":
-            key_down(key_code)
-        elif pressure == "up":
-            key_up(key_code)
-        else:
-            press_key(key_code)
-
-    else:
-        logger.warning(f"Unknown VirtualKey command: {key_code}")
-        return

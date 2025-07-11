@@ -1,6 +1,6 @@
 import asyncio, time, websockets, json
 from app.client.authenticator import on_auth_start, handle_auth_response
-from app.client.interactables import trackpad, action, volume, button
+from app.client.interactables import trackpad, action, text, volume, button
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -75,8 +75,8 @@ async def handle_client(websocket):
                         response = action.handle_action(data)
                         await respond(websocket, msg_sender, response)
 
-                    elif msg_type == "vk":
-                        response = action.handle_vk(data)
+                    elif msg_type == "text":
+                        response = text.handle_text_event(data)
                         await respond(websocket, msg_sender, response)
 
                     elif msg_type == "button":
