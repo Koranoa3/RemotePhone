@@ -98,56 +98,6 @@ NO_KEYUP_ACTIONS = [
     win32con.VK_MEDIA_PREV_TRACK,
     win32con.VK_VOLUME_MUTE,
 ],
-KEY_BSCAN = {
-    "insert": 0x52,
-    "delete": 0x53,
-    "home": 0x47,
-    "end": 0x4F,
-    "page_up": 0x49,
-    "pageup": 0x49,  # alternative
-    "pg_up": 0x49,  # alternative
-    "page_down": 0x51,
-    "pagedown": 0x51,  # alternative
-    "pg_down": 0x51,  # alternative
-    "num_lock": 0x45,
-    "caps_lock": 0x3A,
-    "scroll_lock": 0x46,
-    "pause": 0xC5,
-    "print_screen": 0xB7,
-    "browser_back": 0xA6,
-    "browser_forward": 0xA7,
-    "key_volume_up": 0xAE,
-    "key_volume_down": 0xAE,
-    "play_pause": 0xB3,
-    "next_track": 0xB0,
-    "prev_track": 0xB1,
-    "mute": 0xAD,
-    "prev_virtual_desktop": [0xA2, 0x5B, 0x25],  # VK_LCONTROL, VK_LWIN, VK_LEFT
-    "next_virtual_desktop": [0xA2, 0x5B, 0x27],  # VK_LCONTROL, VK_LWIN, VK_RIGHT
-    "screenshot": 0x2C,  # VK_SNAPSHOT
-    "win": 0x5B,  # VK_LWIN
-    "windows": 0x5B,  # VK_LWIN alternative
-    "esc": 0x1B,  # VK_ESCAPE
-    "escape": 0x1B,  # VK_ESCAPE alternative
-    "enter": 0x0D,  # VK_RETURN
-    "return": 0x0D,  # VK_RETURN alternative
-    "space": 0x20,  # VK_SPACE
-    "backspace": 0x08,  # VK_BACK
-    "tab": 0x09,  # VK_TAB
-    "ctrl": 0xA2,  # VK_LCONTROL
-    "shift": 0xA0,  # VK_LSHIFT
-    "alt": 0xA4,  # VK_LMENU
-    "prev": 0x21,  # VK_PRIOR
-    "previous": 0x21,  # VK_PRIOR alternative
-    "next": 0x22,  # VK_NEXT
-    "up": 0x26,  # VK_UP
-    "down": 0x28,  # VK_DOWN
-    "left": 0x25,  # VK_LEFT
-    "right": 0x27,  # VK_RIGHT
-    **{chr(i).lower(): i for i in range(0x41, 0x5B)},  # a-z
-    **{chr(i): i for i in range(0x30, 0x3A)},  # 0-9
-    **{f"f{i}": 0x3A + i for i in range(1, 25)},  # F1-F24
-}
 
 def press_key(key_code):
     try:
