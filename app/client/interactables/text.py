@@ -12,14 +12,18 @@ ime.send_text.restype = None
 
 def send_string(text: str):
     ime.send_text(text)
-            
+
+def send_return():
+    """Returnキーを送信する"""
+    ime.return_key()
 
 def handle_text_event(data):
     """キーボードイベントを処理する"""
     try:
         text = data.get("text", None)
+        ent = data.get("ent", False)
+        
         if not text:
-            logger.warning("No text in data")
             return "No text"
         
         if isinstance(text, str) and (text.startswith("[") or text.startswith("{")):
@@ -41,3 +45,6 @@ def handle_text_event(data):
     except Exception as e:
         logger.exception("Exception in handle_text_event: %s", e)
         return f"Error: {e}"
+    finally:
+        if ent:
+            send_return()

@@ -23,10 +23,16 @@ VK_MAP.update({
     "windows": VK_MAP["lwin"],
     "esc": VK_MAP["escape"],
     "ret": VK_MAP["return"],
+    "backspace": VK_MAP["back"],
+    "bs": VK_MAP["back"],
     "del": VK_MAP["delete"],
     "ctrl": VK_MAP["control"],
     "alt": VK_MAP["menu"],  # alt
     "bksp": VK_MAP["back"],
+    
+    "play_pause": VK_MAP["media_play_pause"],
+    "next_track": VK_MAP["media_next_track"],
+    "prev_track": VK_MAP["media_prev_track"],
     
     "prev_virtual_desktop": [win32con.VK_LCONTROL, win32con.VK_LWIN, win32con.VK_LEFT],
     "next_virtual_desktop": [win32con.VK_LCONTROL, win32con.VK_LWIN, win32con.VK_RIGHT],
