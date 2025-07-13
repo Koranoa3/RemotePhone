@@ -23,15 +23,17 @@ def get_current_passkey() -> dict:
     timestamp = int(time.time())
     # Check if key exists and is still valid
     if _current_key and _key_limit and timestamp < _key_limit:
+        _old_key = onetime_passkey(timestamp=timestamp-15)
         expire_in = KEY_EXPIRE - (timestamp % KEY_EXPIRE)
-        return {"key": _current_key, "expire_in": expire_in}
+        return {"key": _current_key, "expire_in": expire_in, "other_key": _old_key}
 
     # Generate new key using onetime_passkey with uuid=None
     _current_key = onetime_passkey(timestamp=timestamp)
+    _old_key = onetime_passkey(timestamp=timestamp-15)
     _key_limit = timestamp + KEY_EXPIRE - (timestamp % KEY_EXPIRE)
 
     expire_in = KEY_EXPIRE - (timestamp % KEY_EXPIRE)
-    return {"key": _current_key, "expire_in": expire_in}
+    return {"key": _current_key, "expire_in": expire_in, "other_key": _old_key}
 
 
 # --- OTP Generation ---
@@ -74,11 +76,6 @@ class AuthSession:
     def __init__(self, uuid: str):
         self.uuid = uuid
         self.attempt = 1
-
-    def is_expired(self):
-        global _key_limit
-        current_time = int(time.time())
-        return not (_key_limit and current_time < _key_limit)
 
 
 # --- Authentication Process ---
@@ -151,18 +148,12 @@ def check_response(ws, onetime: str) -> dict:
             "reason": "No session found",
             "allow_retry": False
         }
-    if session.is_expired():
-        return {
-            "type": "auth_result",
-            "status": "fail",
-            "reason": "Passkey has expired",
-            "allow_retry": True
-        }
     
     passkey_info = get_current_passkey()
     current_passkey = passkey_info["key"]
+    old_available_passkey = passkey_info["other_key"]
     
-    if onetime != current_passkey:
+    if onetime != current_passkey and onetime != old_available_passkey:
         if session.attempt > KEY_ATTEMPT_LIMIT:
             return {
                 "type": "auth_result",
