@@ -1,6 +1,8 @@
 import time
 from datetime import datetime
+import subprocess
 
+from app.common import app_path
 from app.client.authenticator import get_current_passkey
 from app.client.clients_manager import load_registered_uuids, unregister_uuid
 from app.config_io import load_host_config, save_host_config
@@ -123,8 +125,23 @@ class ReleaseApi:
         }
     
     def update_now(self):
-        # 仮実装
+        import os
         logger.info("update_now called")
+        # 完全に別インスタンスでexeを起動
+        exe_path = app_path("RemotePhoneLauncher.exe")
+        subprocess.Popen(
+            [exe_path, "--force-update"],
+            creationflags=subprocess.DETACHED_PROCESS
+        )
+        import socket
+        COMMAND_PORT = 63136
+        try:
+            with socket.create_connection(("127.0.0.1", COMMAND_PORT), timeout=1) as sock:
+                sock.sendall(b"exit")
+                logger.info("Sent command to the existing application")
+        except (ConnectionRefusedError, TimeoutError):
+            logger.error("The application is not running or is not responding")
+            
         return True
 
 # --- API integration ---

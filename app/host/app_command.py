@@ -16,6 +16,12 @@ def handle_command(conn):
         logger.info("Received command to show window.")
         from app.host.window import start_webview_process
         start_webview_process()
+    elif data == "exit":
+        logger.info("Received command to exit.")
+        from app.host.window import stop_webview_process
+        stop_webview_process()
+        import os
+        os._exit(0)
     conn.close()
 
 def command_server():
