@@ -23,28 +23,31 @@ def handle_text_event(data):
         text = data.get("text", None)
         ent = data.get("ent", False)
         
-        if not text:
-            return "No text"
-        
-        if isinstance(text, str) and (text.startswith("[") or text.startswith("{")):
-            try:
-                text = json.loads(text)
-            except json.JSONDecodeError as e:
-                logger.error(f"Error parsing JSON text: {e}")
-
-        if isinstance(text, str):
-            send_string(text)
+        if not text and not ent:
+            logger.warning("No text or ent provided in data")
             return
-        elif isinstance(text, list):
-            for line in text:
-                send_string(line)
+        elif not text and ent:
+            send_return()
             return
         else:
-            logger.error("Invalid text type: %s", type(text))
-            return "Invalid"
+            if isinstance(text, str) and (text.startswith("[") or text.startswith("{")):
+                try:
+                    text = json.loads(text)
+                except json.JSONDecodeError as e:
+                    logger.error(f"Error parsing JSON text: {e}")
+            
+            elif isinstance(text, str):
+                send_string(text)
+            
+            elif isinstance(text, list):
+                for line in text:
+                    send_string(line)
+            
+            else:
+                logger.error("Invalid text type: %s", type(text))
+                return "Invalid"
+            if ent:
+                send_return()
     except Exception as e:
         logger.exception("Exception in handle_text_event: %s", e)
         return f"Error: {e}"
-    finally:
-        if ent:
-            send_return()
