@@ -1,0 +1,31 @@
+{
+  "name": "remotephone-host-settings",
+  "version": "1.0.0",
+  "description": "Host settings for RemotePhone application using Electron and React.",
+  "main": "electron/main.ts",
+  "scripts": {
+    "start": "electron .",
+    "build": "tsc",
+    "dev": "concurrently \"tsc -w\" \"electron .\"",
+    "package": "electron-builder"
+  },
+  "dependencies": {
+    "electron": "^latest",
+    "react": "^latest",
+    "react-dom": "^latest"
+  },
+  "devDependencies": {
+    "concurrently": "^latest",
+    "typescript": "^latest",
+    "electron-builder": "^latest",
+    "@types/react": "^latest",
+    "@types/react-dom": "^latest"
+  },
+  "homepage": "https://github.com/yourusername/remotephone-host-settings",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/remotephone-host-settings.git"
+  },
+  "author": "Your Name",
+  "license": "MIT"
+}
