@@ -8,6 +8,9 @@ import atexit
 import tkinter.messagebox as messagebox
 
 from launcher.modules.version_utils import get_latest_app_dir
+from launcher.modules.logger import get_logger
+
+logger = get_logger(__name__)
 
 EXE_NAME = "RemotePhoneHost.exe"
 LOCK_FILE = os.path.join(tempfile.gettempdir(), 'RemotePhoneLauncher.lock')
@@ -33,15 +36,15 @@ def launch_app() -> None:
     try:
         subprocess.Popen([app_path], shell=False)
     except Exception as e:
-        print(f"[Error] Failed to launch the new app: {e}") 
+        logger.error(f"Failed to launch the new app: {e}") 
 
 def show_application_window() -> None:
     try:
         with socket.create_connection(("127.0.0.1", COMMAND_PORT), timeout=1) as sock:
             sock.sendall(b"show_window")
-            print("Sent command to the existing application")
+            logger.info("Sent command to the existing application")
     except (ConnectionRefusedError, TimeoutError):
-        print("[ERROR] The application is not running or is not responding")
+        logger.error("The application is not running or is not responding")
 
 
 def _is_windows() -> bool:
@@ -60,7 +63,7 @@ def _is_process_running(name) -> bool:
 
 def _create_lock() -> bool:
     if os.path.exists(LOCK_FILE):
-        print("The application is already running. Exiting.")
+        logger.info("The application is already running. Exiting.")
         return False
     with open(LOCK_FILE, 'w') as f:
         f.write(str(os.getpid()))

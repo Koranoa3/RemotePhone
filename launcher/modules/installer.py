@@ -12,9 +12,12 @@ RETRY_DELAYS = [3, 5, 10, 20, 30]  # seconds
 
 from launcher.modules.version_utils import get_local_versions, APP_DIR_PREFIX
 from launcher.modules.window import UpdaterWindow
+from launcher.modules.logger import get_logger
 
-def install_release(version, window:UpdaterWindow, force_retry:False) -> bool:
-    print(("[force update]" if force_retry else "")+"Downloading version:", version)
+logger = get_logger(__name__)
+
+def install_release(version, window:UpdaterWindow, force_retry=False) -> bool:
+    logger.info(f"{'[force update] ' if force_retry else ''}Downloading version: {version}")
     window.set_status("Downloading latest version...")
     os.makedirs(TEMP_DIR, exist_ok=True)
     zip_path = os.path.join(TEMP_DIR, "update.zip")
@@ -23,14 +26,14 @@ def install_release(version, window:UpdaterWindow, force_retry:False) -> bool:
             app_dir = f"{APP_DIR_PREFIX}{version}"
             if os.path.exists(app_dir):
                 shutil.rmtree(app_dir)
-            print("Download complete.")
+            logger.info("Download complete.")
             
             window.set_status("Extracting update...")
             if _extract_zip(zip_path, app_dir):
-                print("Update extracted successfully.")
+                logger.info("Update extracted successfully.")
                 return True
             else:
-                print("[Abort] Failed to extract the update")
+                logger.error("[Abort] Failed to extract the update")
                 window.set_status("Failed to extract update.")
                 cleanup()
                 time.sleep(1)
@@ -41,7 +44,9 @@ def install_release(version, window:UpdaterWindow, force_retry:False) -> bool:
             else:
                 window.set_status(f"Download failed. Retrying in {result} seconds...")
     else:
-        print("[Abort] Failed to download the update")
+        logger.error("[Abort] Failed to download the update")
+        return False
+        
 
 def cleanup() -> None:
     if os.path.exists(TEMP_DIR):
@@ -51,12 +56,12 @@ def cleanup() -> None:
         try:
             shutil.rmtree(dir_name)
         except Exception as e:
-            print(f"[Error] Failed to delete old version: {e}")
+            logger.error(f"Failed to delete old version: {e}")
 
 def _download_update(version, zip_path, force_retry=False):
     attempt = 1
     while force_retry or attempt <= MAX_RETRIES:
-        print(f"[Attempt {attempt}] Downloading version {version}...")
+        logger.info(f"[Attempt {attempt}] Downloading version {version}...")
         try:
             download_url = f"{RELEASES_URL}/{version}/download"
             res = requests.get(download_url, timeout=MAX_TIMEOUT)
@@ -66,7 +71,7 @@ def _download_update(version, zip_path, force_retry=False):
             yield True
             return True
         except Exception as e:
-            print(f"[Retry {attempt}] Download failed: {e}")
+            logger.warning(f"[Retry {attempt}] Download failed: {e}")
             wait_time = RETRY_DELAYS[min(attempt - 1, len(RETRY_DELAYS) - 1)]
             for remaining in range(wait_time, 0, -1):
                 yield remaining
@@ -81,7 +86,7 @@ def _extract_zip(zip_path, extract_to) -> bool:
             zip_ref.extractall(extract_to)
         return True
     except zipfile.BadZipFile as e:
-        print(f"[Error] Bad zip file: {e}")
+        logger.error(f"Bad zip file: {e}")
     except Exception as e:
-        print(f"[Error] Failed to extract zip file: {e}")
+        logger.error(f"Failed to extract zip file: {e}")
     return False

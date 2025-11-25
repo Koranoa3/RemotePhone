@@ -2,6 +2,10 @@ import os
 import re
 import requests
 
+from launcher.modules.logger import get_logger
+
+logger = get_logger(__name__)
+
 VERSION_INFO_URL = "http://skyboxx.tplinkdns.com:8000/api/releases/latest/version"
 MAX_TIMEOUT = 10
 APP_DIR_PREFIX = "app-"
@@ -16,7 +20,7 @@ def get_latest_version() -> str|None:
         res.raise_for_status()
         return res.json().get("version")
     except Exception as e:
-        print(f"[Error] Failed to fetch the latest version: {e}")
+        logger.error(f"Failed to fetch the latest version: {e}")
         return None
 
 def get_local_versions() -> list[tuple[str, str]]: # [ ("v0.0.0", "app-v0.0.0") ]
