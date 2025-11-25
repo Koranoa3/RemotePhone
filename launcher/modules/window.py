@@ -5,7 +5,10 @@ class UpdaterWindow:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("RemotePhone Launcher")
-        self.root.iconbitmap(default="app.ico")
+        try:
+            self.root.iconbitmap(default="app.ico")
+        except:
+            pass
         self.root.geometry("400x200")
         self.root.resizable(False, False)
         self.root.attributes('-topmost', True)
