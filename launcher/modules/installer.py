@@ -29,15 +29,27 @@ def install_release(version, window:UpdaterWindow, force_retry=False) -> bool:
             logger.info("Download complete.")
             
             window.set_status("Extracting update...")
-            if _extract_zip(zip_path, app_dir):
-                logger.info("Update extracted successfully.")
-                return True
-            else:
-                logger.error("[Abort] Failed to extract the update")
-                window.set_status("Failed to extract update.")
-                cleanup()
-                time.sleep(1)
-                return False
+            extract_attempts = 0
+            max_extract_attempts = 3
+            extract_delays = [5, 10, 30]  # seconds
+            
+            while extract_attempts < max_extract_attempts:
+                if _extract_zip(zip_path, app_dir):
+                    logger.info("Update extracted successfully.")
+                    return True
+                else:
+                    extract_attempts += 1
+                    if extract_attempts < max_extract_attempts:
+                        wait_time = extract_delays[extract_attempts - 1]
+                        logger.warning(f"[Extract Retry {extract_attempts}] Failed to extract. Retrying in {wait_time} seconds...")
+                        window.set_status(f"Extraction failed. Retrying in {wait_time} seconds...")
+                        time.sleep(wait_time)
+                    else:
+                        logger.error("[Abort] Failed to extract the update after all retries")
+                        window.set_status("Failed to extract update.")
+                        cleanup()
+                        time.sleep(1)
+                        return False
         elif type(result) is int:
             if result == 0:
                 window.set_status("Downloading latest version...")
