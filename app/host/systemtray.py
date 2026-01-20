@@ -3,6 +3,7 @@ from logging import getLogger
 
 import pystray
 from PIL import Image
+from app.common import app_resource_path
 from app.host.notifer import notify, NotificationCategory
 from app.host.window import start_webview_process, stop_webview_process
 
@@ -15,7 +16,7 @@ register_with_retry = None  # Set externally
 
 def run_tray():
     global tray_icon
-    tray_icon = pystray.Icon("RemotePhone", Image.open("app.ico"), menu=_generate_menu())
+    tray_icon = pystray.Icon("RemotePhone", Image.open(app_resource_path("app.ico")), menu=_generate_menu())
     try:
         tray_icon.run()
     except Exception as e:
