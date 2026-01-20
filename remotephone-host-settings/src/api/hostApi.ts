@@ -12,7 +12,7 @@ export const getSettings = async () => {
     }
 };
 
-export const updateSettings = async (settings) => {
+export const setSettings = async (settings: any) => {
     try {
         const response = await axios.post(`${API_BASE_URL}/settings`, settings);
         return response.data;
@@ -32,7 +32,7 @@ export const getRegisteredDevices = async () => {
     }
 };
 
-export const deleteRegisteredDevice = async (uuid) => {
+export const deleteRegisteredDevice = async (uuid: string) => {
     try {
         const response = await axios.delete(`${API_BASE_URL}/devices/${uuid}`);
         return response.data;
