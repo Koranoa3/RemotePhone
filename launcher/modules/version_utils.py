@@ -6,7 +6,7 @@ from launcher.modules.logger import get_logger
 
 logger = get_logger(__name__)
 
-VERSION_INFO_URL = "http://skyboxx.tplinkdns.com:8000/api/releases/latest/version"
+VERSION_INFO_URL = "https://remotephone.koranoa.works/api/releases/latest/version"
 MAX_TIMEOUT = 10
 APP_DIR_PREFIX = "app-"
 

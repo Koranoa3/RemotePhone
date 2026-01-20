@@ -80,7 +80,7 @@ systemtray.register_with_retry = register_with_retry
 
 ### main function ###############################
 
-SERVER_URL = "http://skyboxx.tplinkdns.com:8000"
+SERVER_URL = "https://remotephone.koranoa.works"
 
 def main():
     logger.info("Application started.")

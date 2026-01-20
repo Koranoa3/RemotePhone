@@ -22,7 +22,7 @@ logger = getLogger(__name__)
 
 
 # Base URL for the server API
-VERSION_INFO_URL = "http://skyboxx.tplinkdns.com:8000/api/releases/"
+VERSION_INFO_URL = "https://remotephone.koranoa.works/api/releases/"
 DEFAULT_TIMEOUT = 5  # Default timeout for network requests
 
 

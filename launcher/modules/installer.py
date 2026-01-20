@@ -6,7 +6,7 @@ import zipfile
 
 MAX_RETRIES = 10
 MAX_TIMEOUT = 10
-RELEASES_URL = "http://skyboxx.tplinkdns.com:8000/api/releases"
+RELEASES_URL = "https://remotephone.koranoa.works/api/releases"
 TEMP_DIR = "temp"
 RETRY_DELAYS = [3, 5, 10, 20, 30]  # seconds
 

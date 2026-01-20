@@ -1,5 +1,5 @@
-const SERVER_URL = "http://skyboxx.tplinkdns.com:8000";
-const LATEST_API_URL = "http://skyboxx.tplinkdns.com:8000/api/releases/latest";
+const SERVER_URL = "https://remotephone.koranoa.works";
+const LATEST_API_URL = "https://remotephone.koranoa.works/api/releases/latest";
 
 window.addEventListener('pywebviewready', async function () {
     console.log('initializing app...');
