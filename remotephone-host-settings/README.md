@@ -1,44 +1,44 @@
 # remotephone-host-settings
 
-This project is a desktop application built using Node.js and React, designed to manage host settings for the RemotePhone application. It utilizes Electron to create a native application experience.
+このプロジェクトは、Node.js と React を使用して構築されたデスクトップアプリケーションで、RemotePhone アプリケーションのホスト設定を管理します。Electron を利用してネイティブなアプリケーション体験を提供します。
 
-## Project Structure
+## プロジェクト構成
 
-- **public/**: Contains static files for the application.
-  - **index.html**: The main HTML entry point where the React application is mounted.
-  - **window.html**: The HTML file for the host settings screen displayed in the Electron window.
+- **public/**: アプリケーションの静的ファイルを格納します。
+  - **index.html**: React アプリケーションがマウントされるメインの HTML エントリポイントです。
+  - **window.html**: Electron ウィンドウで表示されるホスト設定画面用の HTML ファイルです。
 
-- **src/**: Contains the source code for the React application.
-  - **api/**: Contains API-related functionality.
-    - **index.ts**: Entry point for the API, exporting related functions.
-    - **hostApi.ts**: Defines the host API methods and endpoints.
-  - **components/**: Contains React components for the application.
-    - **SettingsPanel.tsx**: The React component for the settings panel, managing the user interface for displaying and modifying settings.
-  - **App.tsx**: The main component of the application, managing overall layout and routing.
-  - **index.tsx**: The entry point for the React application, mounting it to the DOM.
-  - **types/**: Contains TypeScript type definitions to enhance type safety.
-    - **index.ts**: Aggregates type definitions used throughout the application.
+- **src/**: React アプリケーションのソースコードを格納します。
+  - **api/**: API 関連の機能を含みます。
+    - **index.ts**: API のエントリポイントで、関連関数をエクスポートします。
+    - **hostApi.ts**: ホスト API のメソッドやエンドポイントを定義します。
+  - **components/**: アプリケーションの React コンポーネントを含みます。
+    - **SettingsPanel.tsx**: 設定パネル用の React コンポーネントで、設定の表示や変更の UI を管理します。
+  - **App.tsx**: アプリケーションのメインコンポーネントで、全体のレイアウトやルーティングを管理します。
+  - **index.tsx**: React アプリケーションのエントリポイントで、DOM へのマウントを行います。
+  - **types/**: TypeScript の型定義を格納し、型安全性を高めます。
+    - **index.ts**: アプリケーション全体で使用される型定義をまとめます。
 
-- **electron/**: Contains files related to the Electron setup.
-  - **main.ts**: Defines the main process for Electron, creating application windows and managing events.
-  - **preload.ts**: The preload script for Electron, providing a secure communication channel between the renderer and main processes.
+- **electron/**: Electron のセットアップ関連ファイルを格納します。
+  - **main.ts**: Electron のメインプロセスを定義し、アプリケーションウィンドウの作成やイベント管理を行います。
+  - **preload.ts**: Electron のプリロードスクリプトで、レンダラープロセスとメインプロセス間の安全な通信チャネルを提供します。
 
-- **package.json**: Defines project dependencies and scripts for Node.js package management.
+- **package.json**: Node.js のパッケージ管理用に、プロジェクトの依存関係やスクリプトを定義します。
 
-- **tsconfig.json**: Configures TypeScript compiler options, specifying files to compile and other options.
+- **tsconfig.json**: TypeScript コンパイラのオプションを設定し、コンパイル対象ファイルやその他のオプションを指定します。
 
-- **README.md**: Documentation for the project, explaining its purpose and usage.
+- **README.md**: プロジェクトの目的や使い方を説明するドキュメントです。
 
-## Getting Started
+## はじめに
 
-1. **Setup Electron**: Use Electron to build the desktop application. Create the application window in `main.ts` and expose APIs securely in `preload.ts`.
+1. **Electron のセットアップ**: Electron を使ってデスクトップアプリケーションを構築します。`main.ts` でアプリケーションウィンドウを作成し、`preload.ts` で API を安全に公開します。
 
-2. **Integrate React**: Mount the React application in `index.tsx`, managing the layout in `App.tsx`, and build the settings screen in `SettingsPanel.tsx`.
+2. **React の統合**: `index.tsx` で React アプリケーションをマウントし、`App.tsx` でレイアウトを管理、`SettingsPanel.tsx` で設定画面を構築します。
 
-3. **Revise API**: Define API methods in `hostApi.ts` and ensure they can be called from React components. Modify API specifications as needed.
+3. **API の改修**: `hostApi.ts` で API メソッドを定義し、React コンポーネントから呼び出せるようにします。必要に応じて API 仕様を修正します。
 
-4. **Configure Build Process**: Add build scripts to `package.json` to utilize pre-built files instead of recompiling every time.
+4. **ビルドプロセスの構成**: `package.json` にビルドスクリプトを追加し、毎回再コンパイルせずにプリビルドファイルを利用できるようにします。
 
-5. **Testing and Debugging**: Launch the application to verify that the settings screen displays correctly and that the API functions as expected.
+5. **テストとデバッグ**: アプリケーションを起動し、設定画面が正しく表示されることや API が期待通りに動作することを確認します。
 
-By following these steps, you can successfully modify the host settings screen as a desktop application using Node.js and React.
+これらの手順に従うことで、Node.js と React を使ったデスクトップアプリケーションとしてホスト設定画面を正常に改修できます。

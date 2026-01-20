@@ -10,16 +10,17 @@
     "package": "electron-builder"
   },
   "dependencies": {
-    "electron": "^latest",
-    "react": "^latest",
-    "react-dom": "^latest"
+    "electron": "latest",
+    "react": "latest",
+    "react-dom": "latest"
   },
   "devDependencies": {
-    "concurrently": "^latest",
-    "typescript": "^latest",
-    "electron-builder": "^latest",
-    "@types/react": "^latest",
-    "@types/react-dom": "^latest"
+    "concurrently": "latest",
+    "typescript": "latest",
+    "electron-builder": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "axios": "0.21.1"
   },
   "homepage": "https://github.com/yourusername/remotephone-host-settings",
   "repository": {
